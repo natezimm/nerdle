@@ -1,0 +1,1 @@
+export const techWords = ["array", "debug", "cache", "stack", "binary", "queue"];

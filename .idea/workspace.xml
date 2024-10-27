@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="a058a53e-24cc-433d-b1f5-fbeadafee410" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/components/Keyboard.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/WordGrid.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/words.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
-    </list>
+    <list default="true" id="a058a53e-24cc-433d-b1f5-fbeadafee410" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -60,7 +57,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1730054659512</updated>
-      <workItem from="1730054660524" duration="305000" />
+      <workItem from="1730054660524" duration="672000" />
     </task>
     <servers />
   </component>
