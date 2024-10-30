@@ -11,16 +11,17 @@
   margin: 5px 0;
 }
 .letter {
-  width: 30px;
-  height: 30px;
-  display: inline-flex;
+  width: 55px;
+  height: 55px;
+  display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid #ddd;
-  margin: 2px;
-  font-size: 20px;
+  font-size: 2rem;
   font-weight: bold;
+  border: 2px solid #3a3a3c;
   text-transform: uppercase;
+  color: #d7dadc;
+  transition: background-color 0.3s ease;
 }
 .correct {
   background-color: #6aaa64;
@@ -34,24 +35,36 @@
   background-color: #787c7e;
   color: #fff;
 }
+
+/*Keyboard Styles*/
 .keyboard {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.keyboard-row {
+  display: flex;
   justify-content: center;
-  max-width: 300px;
-  margin: 10px auto;
+  gap: 6px;
 }
+
 .key {
-  width: 30px;
-  height: 30px;
-  margin: 2px;
-  font-size: 16px;
-  font-weight: bold;
+  width: 40px;
+  height: 58px;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  border: 2px solid #3a3a3c;
+  background-color: #818384;
+  color: #ffffff;
+  border-radius: 4px;
+  cursor: pointer;
 }
-.guess-input {
-  padding: 5px;
-  margin-right: 10px;
+
+.key-wide {
+  width: 60px; /* Makes Enter and Backspace buttons wider */
 }
-.guess-button {
-  padding: 5px 10px;
+
+.half-spacer {
+  width: 20px;
 }

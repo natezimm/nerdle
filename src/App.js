@@ -5,50 +5,61 @@ import Keyboard from './components/Keyboard';
 import './App.css';
 
 const App = () => {
-  const [targetWord, setTargetWord] = useState("");
-  const [currentGuess, setCurrentGuess] = useState("");
-  const [attempts, setAttempts] = useState([]);
-  const [message, setMessage] = useState("");
-  const maxAttempts = 6;
+    const [targetWord, setTargetWord] = useState("");
+    const [attempts, setAttempts] = useState([]);  // Stores all guessed words
+    const [currentGuess, setCurrentGuess] = useState("");  // Stores the letters of the current guess
+    const [message, setMessage] = useState("");
+    const maxAttempts = 6;
 
-  useEffect(() => {
-    setTargetWord(techWords[Math.floor(Math.random() * techWords.length)]);
-  }, []);
+    useEffect(() => {
+        // Set a random target word when the game starts
+        setTargetWord(techWords[Math.floor(Math.random() * techWords.length)]);
+    }, []);
 
-  const handleGuess = () => {
-    if (currentGuess.length !== targetWord.length) {
-      setMessage("Enter a full word!");
-      return;
-    }
+    // Handle keyboard input
+    const handleKeyPress = (key) => {
+        if (key === "Enter") {
+            submitGuess();
+        } else if (key === "Backspace") {
+            setCurrentGuess((prev) => prev.slice(0, -1));
+        } else if (/^[a-zA-Z]$/.test(key) && currentGuess.length < targetWord.length) {
+            setCurrentGuess((prev) => prev + key.toLowerCase());
+        }
+    };
 
-    if (currentGuess.toLowerCase() === targetWord) {
-      setMessage("You guessed correctly!");
-    } else if (attempts.length + 1 >= maxAttempts) {
-      setMessage(`Out of attempts! The word was ${targetWord}`);
-    } else {
-      setMessage("Try again!");
-      setAttempts([...attempts, currentGuess]);
-    }
+    const submitGuess = () => {
+        if (currentGuess.length !== targetWord.length) {
+            setMessage("Guess must be 5 letters.");
+            return;
+        }
 
-    setCurrentGuess("");
-  };
+        setAttempts([...attempts, currentGuess]);
+        setCurrentGuess("");
 
-  return (
-      <div className="game-container">
-        <h1>Tech Word Guess</h1>
-        <WordGrid attempts={attempts} targetWord={targetWord} />
-        <input
-            value={currentGuess}
-            onChange={(e) => setCurrentGuess(e.target.value)}
-            maxLength={targetWord.length}
-            placeholder="Guess the tech word"
-            className="guess-input"
-        />
-        <button onClick={handleGuess} className="guess-button">Submit</button>
-        <p>{message}</p>
-        <Keyboard setCurrentGuess={setCurrentGuess} currentGuess={currentGuess} />
-      </div>
-  );
+        if (currentGuess === targetWord) {
+            setMessage("Congratulations! You've guessed the word.");
+        } else if (attempts.length + 1 >= maxAttempts) {
+            setMessage(`Game over! The word was ${targetWord}.`);
+        } else {
+            setMessage("");
+        }
+    };
+
+    // Listen for key presses
+    useEffect(() => {
+        const handleKeyDown = (event) => handleKeyPress(event.key);
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [currentGuess, attempts]);
+
+    return (
+        <div className="game-container">
+            <h1>Tech Word Guess</h1>
+            <WordGrid attempts={attempts} currentGuess={currentGuess} targetWord={targetWord} />
+            <p>{message}</p>
+            <Keyboard onKeyPress={handleKeyPress} />
+        </div>
+    );
 };
 
 export default App;
