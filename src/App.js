@@ -54,7 +54,7 @@ const App = () => {
 
     return (
         <div className="game-container">
-            <h1>Tech Word Guess</h1>
+            <h1>Nerdle</h1>
             <WordGrid attempts={attempts} currentGuess={currentGuess} targetWord={targetWord} />
             <p>{message}</p>
             <Keyboard onKeyPress={handleKeyPress} />
