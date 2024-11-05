@@ -21,9 +21,10 @@ const WordGrid = ({ attempts, currentGuess, targetWord }) => {
                         {Array.from({ length: wordLength }).map((_, letterIndex) => {
                             const letter = guess[letterIndex] || "";
                             const statusClass = !isCurrentRow && letter ? getLetterStatus(letter, letterIndex) : "";
+                            const filledClass = letter ? "letter-filled" : "letter-empty";
 
                             return (
-                                <span key={letterIndex} className={`letter ${statusClass}`}>
+                                <span key={letterIndex} className={`letter ${statusClass} ${filledClass}`}>
                                     {letter}
                                 </span>
                             );

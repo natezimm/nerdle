@@ -31,6 +31,18 @@
   transition: background-color 0.3s ease;
 }
 
+.letter:nth-child(2n) {
+  margin: 0 5px;
+}
+
+.letter-empty {
+  border: 2px solid #d3d6da;
+}
+
+.letter-filled {
+  border: 2px solid #878a8c;
+}
+
 .correct {
   background-color: #6aaa64;
   color: #fff;
