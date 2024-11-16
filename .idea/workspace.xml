@@ -4,7 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a058a53e-24cc-433d-b1f5-fbeadafee410" name="Changes" comment="Add concurrently package" />
+    <list default="true" id="a058a53e-24cc-433d-b1f5-fbeadafee410" name="Changes" comment="Add concurrently package">
+      <change afterPath="$PROJECT_DIR$/client/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/WordGrid.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/WordGrid.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -85,7 +93,7 @@
       <updated>1730054659512</updated>
       <workItem from="1730054660524" duration="13687000" />
       <workItem from="1731368520830" duration="10082000" />
-      <workItem from="1731461348529" duration="12933000" />
+      <workItem from="1731461348529" duration="13883000" />
     </task>
     <task id="LOCAL-00001" summary="Add package.json for vercel">
       <option name="closed" value="true" />

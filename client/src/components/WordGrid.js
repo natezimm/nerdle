@@ -23,6 +23,12 @@ const WordGrid = ({ attempts, currentGuess, targetWord }) => {
         }
     }, [attempts]);
 
+    const getLetterStatus = (letter, index) => {
+        if (targetWord[index] === letter) return "correct";
+        if (targetWord.includes(letter)) return "present";
+        return "absent";
+    };
+
     useEffect(() => {
         if (flippedLetters.length === wordLength && flippingRow !== null) {
             const newStatuses = { ...persistedStatuses };
@@ -38,13 +44,7 @@ const WordGrid = ({ attempts, currentGuess, targetWord }) => {
             setPersistedStatuses(newStatuses);
             setFlippingRow(null); // Reset flipping row
         }
-    }, [flippedLetters, attempts, flippingRow]);
-
-    const getLetterStatus = (letter, index) => {
-        if (targetWord[index] === letter) return "correct";
-        if (targetWord.includes(letter)) return "present";
-        return "absent";
-    };
+    }, [flippedLetters, attempts, flippingRow, getLetterStatus, persistedStatuses]);
 
     const getFlipClasses = (statusClass, rowIndex, letterIndex) => {
         const isPersisted = persistedStatuses[rowIndex]?.[letterIndex];

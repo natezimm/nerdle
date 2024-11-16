@@ -5,9 +5,15 @@ import techWords from './techWords.js';
 import fiveLetterWords from './utils.js';
 
 const app = express();
-const PORT = 5001;
+const port = process.env.PORT || 4000;
 
-app.use(cors());
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 app.get('/api/words/random', (req, res) => {
@@ -21,6 +27,6 @@ app.post('/api/words/validate', (req, res) => {
     res.json({ valid: isValid });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
 });

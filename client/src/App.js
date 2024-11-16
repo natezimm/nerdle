@@ -13,9 +13,11 @@ const App = () => {
     const [gameOver, setGameOver] = useState(false);
     const maxAttempts = 6;
 
+    const apiUrl = process.env.REACT_APP_API_URL;
+
     useEffect(() => {
         // Fetch a random word from the backend when the game starts
-        axios.get('/api/words/random')
+        axios.get(`${apiUrl}/api/words/random`)
             .then((response) => {
                 setTargetWord(response.data.word);
             })
@@ -23,7 +25,7 @@ const App = () => {
                 console.error("Error fetching the word:", error);
                 setMessage("Failed to fetch the word. Please try again later.");
             });
-    }, []);
+    }, [apiUrl]);
 
     const updateLetterStatuses = useCallback((guess) => {
         const newStatuses = { ...letterStatuses };
@@ -54,7 +56,7 @@ const App = () => {
             return;
         }
 
-        axios.post('/api/words/validate', { word: currentGuess })
+        axios.post(`${apiUrl}/api/words/validate`, { word: currentGuess })
             .then((response) => {
                 if (!response.data.valid) {
                     setMessage("Invalid word. Try again.");
@@ -81,7 +83,7 @@ const App = () => {
                 console.error("Error validating the word:", error);
                 setMessage("Error validating the word. Please try again.");
             });
-    }, [currentGuess, targetWord, attempts.length, maxAttempts, updateLetterStatuses, gameOver]);
+    }, [currentGuess, targetWord, attempts.length, maxAttempts, updateLetterStatuses, gameOver, apiUrl]);
 
     const handleKeyPress = useCallback((key) => {
         if (gameOver) return; // Prevent actions after the game is over
