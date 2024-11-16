@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a058a53e-24cc-433d-b1f5-fbeadafee410" name="Changes" comment="" />
+    <list default="true" id="a058a53e-24cc-433d-b1f5-fbeadafee410" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/WordGrid.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/WordGrid.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/techWords.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/techWords.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,6 +31,9 @@
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -69,6 +78,8 @@
       <option name="presentableId" value="Default" />
       <updated>1730054659512</updated>
       <workItem from="1730054660524" duration="13687000" />
+      <workItem from="1731368520830" duration="10082000" />
+      <workItem from="1731461348529" duration="4890000" />
     </task>
     <servers />
   </component>

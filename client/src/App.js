@@ -29,19 +29,21 @@ const App = () => {
         const newStatuses = { ...letterStatuses };
         const targetWordArray = targetWord.split('');
 
-        guess.split('').forEach((letter, index) => {
-            if (targetWordArray[index] === letter) {
-                newStatuses[letter] = 'correct'; // Correct position
-            } else if (targetWordArray.includes(letter)) {
-                if (newStatuses[letter] !== 'correct') {
-                    newStatuses[letter] = 'present'; // Wrong position
+        setTimeout(() => {
+            guess.split('').forEach((letter, index) => {
+                if (targetWordArray[index] === letter) {
+                    newStatuses[letter] = 'correct'; // Correct position
+                } else if (targetWordArray.includes(letter)) {
+                    if (newStatuses[letter] !== 'correct') {
+                        newStatuses[letter] = 'present'; // Wrong position
+                    }
+                } else {
+                    newStatuses[letter] = 'absent'; // Not in the word
                 }
-            } else {
-                newStatuses[letter] = 'absent'; // Not in the word
-            }
-        });
+            });
 
-        setLetterStatuses(newStatuses);
+            setLetterStatuses(newStatuses); // Update the letter statuses after delay
+        }, 1500);
     }, [letterStatuses, targetWord]);
 
     const submitGuess = useCallback(() => {
