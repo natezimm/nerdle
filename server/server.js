@@ -1,7 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import path from "path";
 import techWords from './techWords.js';
 import fiveLetterWords from './utils.js';
 
@@ -17,8 +16,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
-
 app.get('/api/words/random', (req, res) => {
     const randomWord = techWords[Math.floor(Math.random() * techWords.length)];
     res.json({ word: randomWord });
@@ -28,11 +25,6 @@ app.post('/api/words/validate', (req, res) => {
     const { word } = req.body;
     const isValid = fiveLetterWords.includes(word) || techWords.includes(word);
     res.json({ valid: isValid });
-});
-
-app.use(express.static(path.join(__dirname, 'client/build')));
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
 });
 
 app.listen(port, () => {
