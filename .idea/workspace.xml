@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a058a53e-24cc-433d-b1f5-fbeadafee410" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/vercel.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="a058a53e-24cc-433d-b1f5-fbeadafee410" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -76,7 +73,7 @@
       <updated>1730054659512</updated>
       <workItem from="1730054660524" duration="13687000" />
       <workItem from="1731368520830" duration="10082000" />
-      <workItem from="1731461348529" duration="8943000" />
+      <workItem from="1731461348529" duration="9282000" />
     </task>
     <servers />
   </component>
