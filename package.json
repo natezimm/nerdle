@@ -2,8 +2,11 @@
   "name": "nerdle",
   "version": "0.1.0",
   "scripts": {
-    "start": "node server/server.js",
-    "build": "cd client && npm install && npm run build",
-    "vercel-build": "npm run build"
+    "start": "concurrently \"npm run start-client\" \"npm run start-server\"",
+    "start-client": "npm run start --prefix client",
+    "start-server": "node server/server.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
   }
 }
