@@ -1,70 +1,106 @@
-# Getting Started with Create React App
+# Nerdle
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Nerdle is a word-guessing game inspired by Wordle, with a focus on technology-related words. The project includes both a React frontend and an Express.js backend.
 
-## Available Scripts
+Project Structure
 
-In the project directory, you can run:
+	•	Client: React application hosted as a static site on Render.
+	•	Server: Express.js API hosted on Render for fetching and validating words.
 
-### `npm start`
+Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+	•	Frontend: React, Axios
+	•	Backend: Node.js, Express
+	•	Hosting: Render
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Getting Started
 
-### `npm test`
+### Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Make sure you have the following installed:
+Node.js, npm
 
-### `npm run build`
+### Development Setup
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Clone the repository:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+   - `git clone https://github.com/your-username/nerdle.git`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+    - `cd nerdle`
 
-### `npm run eject`
+2. Install dependencies:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+    - For the server:
+    
+      - `cd server`
+      - `npm install`
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    - For the client:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+      - `cd client`
+      - `npm install`
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+3. Start development servers:
 
-## Learn More
+    - In the server directory:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+      - `npm start`
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+   - In the client directory:
 
-### Code Splitting
+     - `npm start`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The client will be available at http://localhost:3000, and the server at http://localhost:4000.
 
-### Analyzing the Bundle Size
+### Environment Variables
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+In the client, create a .env file with:
 
-### Making a Progressive Web App
+- REACT_APP_API_URL=http://localhost:4000
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+In production, set REACT_APP_API_URL to:
 
-### Advanced Configuration
+- REACT_APP_API_URL=https://nerdle-server.onrender.com
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Build and Deploy
 
-### Deployment
+#### Client:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+The client is built for production using:
 
-### `npm run build` fails to minify
+`npm run build`
+This generates a build folder with static assets.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+#### Server:
+
+No additional build step is required for the server.
+
+#### Deployment
+
+The project is hosted on Render. Here’s how the configuration is set up: <br />
+•	Client: Deployed as a static site. <br />
+•	Build Command: `npm run build` <br />
+•	Publish Directory: build <br />
+•	Server: Deployed as a web service. <br />
+•	Start Command: `npm start` <br />
+•	Root Directory: server
+
+### API Endpoints
+
+    •GET /api/words/random
+        Returns a random word from the tech word list.
+    •POST /api/words/validate
+        Validates a user-submitted word.
+    
+    Request body: { "word": "yourword" }
+    Response: { "valid": true/false }
+
+Contributing
+
+Feel free to fork and submit pull requests. Contributions are welcome!
+
+License
+
+MIT
+
+Let me know if further adjustments are needed!
