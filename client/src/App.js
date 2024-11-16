@@ -13,7 +13,7 @@ const App = () => {
     const [gameOver, setGameOver] = useState(false);
     const maxAttempts = 6;
 
-    const apiUrl = process.env.REACT_APP_API_URL;
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 
     useEffect(() => {
         // Fetch a random word from the backend when the game starts

@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import path from "path";
 import techWords from './techWords.js';
 import fiveLetterWords from './utils.js';
 
@@ -8,13 +9,15 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: process.env.NODE_ENV === 'production' ? 'https://nerdle.onrender.com' : 'http://localhost:3000',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
 };
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 app.get('/api/words/random', (req, res) => {
     const randomWord = techWords[Math.floor(Math.random() * techWords.length)];
@@ -25,6 +28,11 @@ app.post('/api/words/validate', (req, res) => {
     const { word } = req.body;
     const isValid = fiveLetterWords.includes(word) || techWords.includes(word);
     res.json({ valid: isValid });
+});
+
+app.use(express.static(path.join(__dirname, 'client/build')));
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
 });
 
 app.listen(port, () => {
