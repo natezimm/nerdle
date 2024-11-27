@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './WordGrid.css';
+import '../styles/WordGrid.css';
 
 const WordGrid = ({ attempts, currentGuess, targetWord }) => {
     const totalRows = 6;
