@@ -1,4 +1,5 @@
 import React from 'react';
+import './Keyboard.css';
 
 const Keyboard = ({ onKeyPress, letterStatuses }) => {
     const firstRow = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"];

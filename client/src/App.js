@@ -67,16 +67,25 @@ const App = () => {
                     updateLetterStatuses(currentGuess);
                     setAttempts((prevAttempts) => [...prevAttempts, currentGuess]); // Ensures new attempt length
                     setCurrentGuess(""); // Reset the current guess for the next round
-                }
 
-                if (currentGuess === targetWord) {
-                    setMessage("Congratulations! You've guessed the word.");
-                    setGameOver(true);
-                } else if (attempts.length + 1 >= maxAttempts) {
-                    setMessage(`Game over! The word was ${targetWord}.`);
-                    setGameOver(true);
-                } else {
-                    setMessage("");
+                    // Calculate delay for the flipping animation
+                    const flipDelay = 300 * currentGuess.length; // Assuming 300ms delay per letter
+
+                    if (currentGuess === targetWord) {
+                        setTimeout(() => {
+                            setMessage("Congratulations! You've guessed the word.");
+                            setGameOver(true);
+                        }, flipDelay); // Delay the message until all flips complete
+                    } else if (attempts.length + 1 >= maxAttempts) {
+                        setTimeout(() => {
+                            setMessage(`Game over! The word was ${targetWord}.`);
+                            setGameOver(true);
+                        }, flipDelay); // Delay the "Game Over" message as well
+                    } else {
+                        setTimeout(() => {
+                            setMessage(""); // Clear the message after flips
+                        }, flipDelay);
+                    }
                 }
             })
             .catch((error) => {
@@ -84,7 +93,6 @@ const App = () => {
                 setMessage("Error validating the word. Please try again.");
             });
     }, [currentGuess, targetWord, attempts.length, maxAttempts, updateLetterStatuses, gameOver, apiUrl]);
-
     const handleKeyPress = useCallback((key) => {
         if (gameOver) return; // Prevent actions after the game is over
 

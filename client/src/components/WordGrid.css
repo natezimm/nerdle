@@ -1,0 +1,78 @@
+.word-grid {
+    margin-bottom: 10px;
+}
+
+.word-row {
+    display: flex;
+    justify-content: center;
+    margin: 5px 0;
+}
+
+.letter {
+    width: 55px;
+    height: 55px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+    border: 2px solid #3a3a3c;
+    text-transform: uppercase;
+    color: #000000;
+    transition: background-color 0.3s ease;
+}
+
+.letter:nth-child(2n) {
+    margin: 0 5px;
+}
+
+.letter-empty {
+    border: 2px solid #d3d6da;
+}
+
+.letter-filled {
+    border: 2px solid #878a8c;
+}
+
+.correct-initial,
+.present-initial,
+.absent-initial {
+    background-color: #d3d6da;
+}
+
+.correct-final {
+    background-color: #6aaa64;
+    border: 2px solid #6aaa64;
+    color: #fff;
+}
+
+.present-final {
+    background-color: #c9b458;
+    border: 2px solid #c9b458;
+    color: #fff;
+}
+
+.absent-final {
+    background-color: #787c7e;
+    color: #fff;
+}
+
+@keyframes flip {
+    0% {
+        transform: scaleY(1);
+    }
+    50% {
+        transform: scaleY(0);
+        background-color: transparent;
+    }
+    51% {
+        background-color: inherit;
+    }
+    100% {
+        transform: scaleY(1);
+    }
+}
+
+.flip {
+    animation: flip 500ms ease forwards;
+}
