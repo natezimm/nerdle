@@ -8,7 +8,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 const corsOptions = {
-    origin: process.env.NODE_ENV === 'production' ? 'https://nerdle.onrender.com' : 'http://localhost:3000',
+    origin: process.env.NODE_ENV === 'production' ? 'https://nerdle-frontend.onrender.com' : 'http://localhost:3000',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
 };
