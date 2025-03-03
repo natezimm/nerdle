@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
@@ -5,10 +6,10 @@ import techWords from './techWords.js';
 import fiveLetterWords from './utils.js';
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = process.env.PORT;
 
 const corsOptions = {
-    origin: process.env.NODE_ENV === 'production' ? 'https://nerdle-frontend.onrender.com' : 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN,
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
 };
@@ -28,5 +29,5 @@ app.post('/api/words/validate', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server is running on port ${port}`);
 });
