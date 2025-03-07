@@ -53,3 +53,24 @@
 .backspace-icon {
     fill: #000;
 }
+
+@media (max-width: 600px) {
+    .key {
+        width: 30px;
+        height: 45px;
+        font-size: 1rem;
+    }
+
+    .key-wide {
+        width: 60px;
+        font-size: 0.75rem;
+    }
+
+    .keyboard-row {
+        gap: 4px;
+    }
+
+    .keyboard {
+        gap: 6px;
+    }
+}
