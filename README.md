@@ -94,13 +94,3 @@ The project is hosted on Render. Here’s how the configuration is set up: <br /
     
     Request body: { "word": "yourword" }
     Response: { "valid": true/false }
-
-Contributing
-
-Feel free to fork and submit pull requests. Contributions are welcome!
-
-License
-
-MIT
-
-Let me know if further adjustments are needed!
