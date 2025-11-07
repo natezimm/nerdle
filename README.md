@@ -1,6 +1,6 @@
 # Nerdle
 
-Nerdle is a word-guessing game inspired by Wordle, with a focus on technology-related words. The project includes both a React frontend and an Express.js backend.
+Nerdle is a word-guessing game inspired by Wordle, with a focus on technology-related words. The project includes a React frontend and an Node.js backend.
 
 Project Structure
 
