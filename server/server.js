@@ -6,7 +6,7 @@ import techWords from './techWords.js';
 import fiveLetterWords from './utils.js';
 
 const app = express();
-const port = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 
 const corsOptions = {
     origin: process.env.CORS_ORIGIN,
