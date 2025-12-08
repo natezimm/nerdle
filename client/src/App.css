@@ -6,6 +6,9 @@
   align-items: center;
   max-width: 600px;
   margin: 0 auto;
+  min-height: 100vh;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .header {
@@ -27,17 +30,13 @@
 
 .stats-button {
   background-color: #787c7e;
-  /* Neutral grey from game palette */
   border: none;
   cursor: pointer;
   padding: 0;
   color: #ffffff;
   width: 42px;
-  /* Fixed width */
   height: 42px;
-  /* Fixed height for square shape */
   border-radius: 10px;
-  /* Rounded corners */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,7 +48,6 @@
 .stats-button:hover {
   background-color: #565758;
   transform: scale(1.05);
-  /* Subtle pop effect */
   color: #ffffff;
 }
 
