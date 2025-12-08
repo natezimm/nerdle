@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import WordGrid from './components/WordGrid';
 import Keyboard from './components/Keyboard';
+import StatsModal from './components/StatsModal';
+import { updateStats } from './utils/stats';
 import './App.css';
 
 const App = () => {
@@ -11,15 +13,17 @@ const App = () => {
     const [message, setMessage] = useState("");
     const [letterStatuses, setLetterStatuses] = useState({});
     const [gameOver, setGameOver] = useState(false);
+    const [isStatsOpen, setIsStatsOpen] = useState(false);
+    const [startTime, setStartTime] = useState(null);
     const maxAttempts = 6;
 
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 
     useEffect(() => {
-        // Fetch a random word from the backend when the game starts
         axios.get(`${apiUrl}/api/words/random`)
             .then((response) => {
                 setTargetWord(response.data.word);
+                setStartTime(Date.now());
             })
             .catch((error) => {
                 console.error("Error fetching the word:", error);
@@ -34,17 +38,17 @@ const App = () => {
         setTimeout(() => {
             guess.split('').forEach((letter, index) => {
                 if (targetWordArray[index] === letter) {
-                    newStatuses[letter] = 'correct'; // Correct position
+                    newStatuses[letter] = 'correct';
                 } else if (targetWordArray.includes(letter)) {
                     if (newStatuses[letter] !== 'correct') {
-                        newStatuses[letter] = 'present'; // Wrong position
+                        newStatuses[letter] = 'present';
                     }
                 } else {
-                    newStatuses[letter] = 'absent'; // Not in the word
+                    newStatuses[letter] = 'absent';
                 }
             });
 
-            setLetterStatuses(newStatuses); // Update the letter statuses after delay
+            setLetterStatuses(newStatuses);
         }, 1500);
     }, [letterStatuses, targetWord]);
 
@@ -65,25 +69,29 @@ const App = () => {
 
                 if (currentGuess.length === 5) {
                     updateLetterStatuses(currentGuess);
-                    setAttempts((prevAttempts) => [...prevAttempts, currentGuess]); // Ensures new attempt length
-                    setCurrentGuess(""); // Reset the current guess for the next round
+                    setAttempts((prevAttempts) => [...prevAttempts, currentGuess]);
+                    setCurrentGuess("");
 
-                    // Calculate delay for the flipping animation
-                    const flipDelay = 300 * currentGuess.length; // Assuming 300ms delay per letter
+                    const flipDelay = 300 * currentGuess.length;
 
                     if (currentGuess === targetWord) {
                         setTimeout(() => {
+                            const timeTaken = Date.now() - startTime;
+                            updateStats(true, attempts.length + 1, timeTaken);
                             setMessage("Congratulations! You've guessed the word.");
                             setGameOver(true);
-                        }, flipDelay); // Delay the message until all flips complete
+                            setIsStatsOpen(true);
+                        }, flipDelay);
                     } else if (attempts.length + 1 >= maxAttempts) {
                         setTimeout(() => {
+                            updateStats(false, maxAttempts, null);
                             setMessage(`Game over! The word was ${targetWord}.`);
                             setGameOver(true);
-                        }, flipDelay); // Delay the "Game Over" message as well
+                            setIsStatsOpen(true);
+                        }, flipDelay);
                     } else {
                         setTimeout(() => {
-                            setMessage(""); // Clear the message after flips
+                            setMessage("");
                         }, flipDelay);
                     }
                 }
@@ -94,12 +102,12 @@ const App = () => {
             });
     }, [currentGuess, targetWord, attempts.length, maxAttempts, updateLetterStatuses, gameOver, apiUrl]);
     const handleKeyPress = useCallback((key) => {
-        if (gameOver) return; // Prevent actions after the game is over
+        if (gameOver) return;
 
         if (key === "Enter") {
-            submitGuess(); // Submit the current guess
+            submitGuess();
         } else if (key === "Backspace") {
-            setCurrentGuess((prev) => prev.slice(0, -1)); // Remove the last letter from the guess
+            setCurrentGuess((prev) => prev.slice(0, -1));
         } else if (/^[a-zA-Z]$/.test(key) && currentGuess.length < 5) {
             setCurrentGuess((prev) => prev + key.toLowerCase()); // Add the key to the current guess
         }
@@ -113,7 +121,13 @@ const App = () => {
 
     return (
         <div className="game-container">
-            <h1>Nerdle</h1>
+            <div className="header">
+                <h1>Nerdle</h1>
+                <button className="stats-button" onClick={() => setIsStatsOpen(true)} aria-label="Statistics">
+                    <i className="fa-solid fa-trophy"></i>
+                </button>
+            </div>
+            <StatsModal isOpen={isStatsOpen} onClose={() => setIsStatsOpen(false)} />
             <WordGrid attempts={attempts} currentGuess={currentGuess} targetWord={targetWord} />
             <p>{message}</p>
             <Keyboard onKeyPress={handleKeyPress} letterStatuses={letterStatuses} />        </div>

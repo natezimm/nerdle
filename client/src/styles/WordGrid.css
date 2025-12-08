@@ -1,7 +1,3 @@
-.word-grid {
-    margin-bottom: 10px;
-}
-
 .word-row {
     display: flex;
     justify-content: center;
@@ -61,13 +57,16 @@
     0% {
         transform: scaleY(1);
     }
+
     50% {
         transform: scaleY(0);
         background-color: transparent;
     }
+
     51% {
         background-color: inherit;
     }
+
     100% {
         transform: scaleY(1);
     }
