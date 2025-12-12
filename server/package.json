@@ -4,7 +4,8 @@
   "main": "server.js",
   "scripts": {
     "build": "cd client && npm run build",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --watchAll=false"
   },
   "keywords": [],
   "author": "",
@@ -18,4 +19,13 @@
     "word-list": "^4.1.0"
   },
   "type": "module"
+  ,
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {}
+  },
+  "devDependencies": {
+    "jest": "29.7.0",
+    "supertest": "6.3.3"
+  }
 }

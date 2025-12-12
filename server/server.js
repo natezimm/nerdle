@@ -28,6 +28,11 @@ app.post('/api/words/validate', (req, res) => {
     res.json({ valid: isValid });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// Export the app for testing. Only listen when not testing.
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+export default app;

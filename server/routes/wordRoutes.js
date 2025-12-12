@@ -17,4 +17,4 @@ router.post('/validate', (req, res) => {
     res.json({ valid: isValid });
 });
 
-module.exports = router;
+export default router;
