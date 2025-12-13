@@ -5,7 +5,7 @@
   "scripts": {
     "build": "cd client && npm run build",
     "start": "node server.js",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --watchAll=false"
+    "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --coverage --watchAll=false"
   },
   "keywords": [],
   "author": "",

@@ -1,96 +1,121 @@
 # Nerdle
 
-Nerdle is a word-guessing game inspired by Wordle, with a focus on technology-related words. The project includes a React frontend and an Node.js backend.
+Nerdle is a Wordle-inspired experience that focuses on technology vocabulary. A React frontend pairs with an Express backend to serve randomized tech words, validate guesses, show letter-flip animations, and store persistent gameplay statistics.
 
-Project Structure
+## Features
 
-	•	Client: React application hosted as a static site on Render.
-	•	Server: Express.js API hosted on Render for fetching and validating words.
+- **Daily challenge feel**: Players have six attempts to guess a five-letter tech word, with animated flip cards revealing correct, present, or absent letters.
+- **Interactive keyboard**: The on-screen keyboard mirrors letter statuses from each guess so feedback stays visible even when using a physical keyboard.
+- **Persistent statistics**: The trophy button opens a modal that summarizes total games, win percentage, streaks, fastest solve time, and fewest guesses; stats are stored in `localStorage`.
+- **Robust validation**: The server checks each guess against both the curated tech word list and the npm `word-list` package to ensure players submit real words.
 
-Tech Stack
+## Tech Stack
 
-	•	Frontend: React, Axios
-	•	Backend: Node.js, Express
-	•	Hosting: Render
+- **Client**: React, Axios, React Scripts, custom CSS for animations.
+- **Server**: Node.js, Express, `word-list` word dictionary, CORS and body parsing middleware.
+- **Hosting**: Render (static site for the client, web service for the API).
 
 ## Getting Started
 
 ### Prerequisites
 
-Make sure you have the following installed:
-Node.js, npm
+- Node.js (recommended 18+)
+- npm (bundled with Node.js)
 
-### Development Setup
+### Installation
 
-1. Clone the repository:
+```bash
+git clone https://github.com/your-username/nerdle.git
+cd nerdle
+```
 
-   - `git clone https://github.com/your-username/nerdle.git`
+Install dependencies for each app:
 
-    - `cd nerdle`
+```bash
+cd server
+npm install
+cd ../client
+npm install
+```
 
-2. Install dependencies:
+### Running Locally
 
-    - For the server:
-    
-      - `cd server`
-      - `npm install`
+1. **Server**
+   ```bash
+   cd server
+   npm start
+   ```
+   The server listens on `http://localhost:4000` by default and exposes the API used by the client.
 
-    - For the client:
-
-      - `cd client`
-      - `npm install`
-
-3. Start development servers:
-
-    - In the server directory:
-
-      - `npm start`
-
-   - In the client directory:
-
-     - `npm start`
-
-The client will be available at http://localhost:3000, and the server at http://localhost:4000.
+2. **Client**
+   ```bash
+   cd client
+   npm start
+   ```
+   The React app runs on `http://localhost:3000` and proxies API requests to the backend.
 
 ### Environment Variables
 
-In the client, create a .env file with:
+- **Client**
+  - `REACT_APP_API_URL` (default: `http://localhost:4000`) – point the client to a different backend in development or production.
 
-- REACT_APP_API_URL=http://localhost:4000
+- **Server**
+  - `PORT` (default: `4000`)
+  - `CORS_ORIGIN` – set to the client origin (e.g., `https://nerdle-client.onrender.com`) to allow browser requests in production.
 
-In production, set REACT_APP_API_URL to:
+## Testing
 
-- REACT_APP_API_URL=https://nerdle-server.onrender.com
+- **Client**
+  ```bash
+  cd client
+  npm run test          # interactive mode
+  npm run test:coverage # single-run coverage report
+  ```
+- **Server**
+  ```bash
+  cd server
+  npm test
+  ```
+  Jest covers the API routes, tech word list, and word list utility loader.
 
-### Build and Deploy
+## Build & Deploy
 
-#### Client:
+- **Client production build**
+  ```bash
+  cd client
+  npm run build
+  ```
+  The build output lands in `client/build`.
 
-The client is built for production using:
+- **Server production workflow**
+  ```bash
+  cd server
+  npm run build  # builds the client and outputs static assets
+  npm start      # serves the API and static bundle (Render config)
+  ```
 
-`npm run build`
-This generates a build folder with static assets.
+Render configuration:
 
-#### Server:
+- **Client**: static site
+  - Build command: `npm run build`
+  - Publish directory: `build`
+- **Server**: web service
+  - Start command: `npm start`
+  - Root directory: `server`
 
-No additional build step is required for the server.
+## API Endpoints
 
-#### Deployment
+- `GET /api/words/random`  
+  Returns a random word from `server/techWords.js`.
 
-The project is hosted on Render. Here’s how the configuration is set up: <br />
-•	Client: Deployed as a static site. <br />
-•	Build Command: `npm run build` <br />
-•	Publish Directory: build <br />
-•	Server: Deployed as a web service. <br />
-•	Start Command: `npm start` <br />
-•	Root Directory: server
+- `POST /api/words/validate`  
+  Validates a lowercase guess against both the curated tech list and the five-letter dictionary sourced from the `word-list` package.  
+  Request body: `{ "word": "guess" }`  
+  Response: `{ "valid": true || false }`
 
-### API Endpoints
+## Gameplay & Experience
 
-    •GET /api/words/random
-        Returns a random word from the tech word list.
-    •POST /api/words/validate
-        Validates a user-submitted word.
-    
-    Request body: { "word": "yourword" }
-    Response: { "valid": true/false }
+- Submit guesses by typing on your keyboard, using the on-screen keyboard, or clicking `Enter`/`Backspace`.
+- Letter tiles animate with a flip sequence and persist their status to help guide future guesses.
+- Tap the trophy button to review how many games you have played, your win rate, streaks, fastest solve time, and fewest guesses.
+

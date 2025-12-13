@@ -24,4 +24,11 @@ describe('Keyboard', () => {
         fireEvent.click(backspaceButton);
         expect(onKeyPress).toHaveBeenCalledWith('Backspace');
     });
+
+    test('handles first row letters through onKeyPress', () => {
+        const onKeyPress = jest.fn();
+        render(<Keyboard onKeyPress={onKeyPress} letterStatuses={{}} />);
+        fireEvent.click(screen.getByRole('button', { name: 'Q' }));
+        expect(onKeyPress).toHaveBeenCalledWith('q');
+    });
 });

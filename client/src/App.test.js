@@ -29,6 +29,24 @@ describe('App', () => {
         jest.useRealTimers();
     });
 
+    test('falls back to default API URL when env var is missing', async () => {
+        const previousApiUrl = process.env.REACT_APP_API_URL;
+        delete process.env.REACT_APP_API_URL;
+
+        axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
+        render(<App />);
+
+        await waitFor(() =>
+            expect(axios.get).toHaveBeenCalledWith('http://localhost:4000/api/words/random')
+        );
+
+        if (previousApiUrl === undefined) {
+            delete process.env.REACT_APP_API_URL;
+        } else {
+            process.env.REACT_APP_API_URL = previousApiUrl;
+        }
+    });
+
     test('shows fetch error message when random word API fails', async () => {
         axios.get.mockRejectedValueOnce(new Error('network failure'));
         render(<App />);

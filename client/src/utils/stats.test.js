@@ -57,6 +57,26 @@ describe('stats utility helpers', () => {
         expect(afterLoss.fewestGuesses).toBe(3);
     });
 
+    test('better stats remain when win is worse than existing records', () => {
+        const existingStats = {
+            totalGames: 10,
+            wins: 5,
+            currentStreak: 0,
+            longestStreak: 5,
+            fastestSolveTime: 3000,
+            fewestGuesses: 3,
+        };
+        localStorage.setItem('nerdle-stats', JSON.stringify(existingStats));
+
+        const updated = updateStats(true, 4, 5000);
+        expect(updated.totalGames).toBe(11);
+        expect(updated.wins).toBe(6);
+        expect(updated.currentStreak).toBe(1);
+        expect(updated.longestStreak).toBe(5);
+        expect(updated.fastestSolveTime).toBe(3000);
+        expect(updated.fewestGuesses).toBe(3);
+    });
+
     test('formats milliseconds into minutes and seconds and handles null', () => {
         expect(formatTime(null)).toBe('--');
         expect(formatTime(65000)).toBe('1:05');

@@ -53,8 +53,6 @@ const App = () => {
     }, [letterStatuses, targetWord]);
 
     const submitGuess = useCallback(() => {
-        if (gameOver) return;
-
         if (currentGuess.length !== 5) {
             setMessage("Guess must be 5 letters.");
             return;
@@ -67,40 +65,38 @@ const App = () => {
                     return;
                 }
 
-                if (currentGuess.length === 5) {
-                    updateLetterStatuses(currentGuess);
-                    setAttempts((prevAttempts) => [...prevAttempts, currentGuess]);
-                    setCurrentGuess("");
+                updateLetterStatuses(currentGuess);
+                setAttempts((prevAttempts) => [...prevAttempts, currentGuess]);
+                setCurrentGuess("");
 
-                    const flipDelay = 300 * currentGuess.length;
+                const flipDelay = 300 * currentGuess.length;
 
-                    if (currentGuess === targetWord) {
-                        setTimeout(() => {
-                            const timeTaken = Date.now() - startTime;
-                            updateStats(true, attempts.length + 1, timeTaken);
-                            setMessage("Congratulations! You've guessed the word.");
-                            setGameOver(true);
-                            setIsStatsOpen(true);
-                        }, flipDelay);
-                    } else if (attempts.length + 1 >= maxAttempts) {
-                        setTimeout(() => {
-                            updateStats(false, maxAttempts, null);
-                            setMessage(`Game over! The word was ${targetWord}.`);
-                            setGameOver(true);
-                            setIsStatsOpen(true);
-                        }, flipDelay);
-                    } else {
-                        setTimeout(() => {
-                            setMessage("");
-                        }, flipDelay);
-                    }
+                if (currentGuess === targetWord) {
+                    setTimeout(() => {
+                        const timeTaken = Date.now() - startTime;
+                        updateStats(true, attempts.length + 1, timeTaken);
+                        setMessage("Congratulations! You've guessed the word.");
+                        setGameOver(true);
+                        setIsStatsOpen(true);
+                    }, flipDelay);
+                } else if (attempts.length + 1 >= maxAttempts) {
+                    setTimeout(() => {
+                        updateStats(false, maxAttempts, null);
+                        setMessage(`Game over! The word was ${targetWord}.`);
+                        setGameOver(true);
+                        setIsStatsOpen(true);
+                    }, flipDelay);
+                } else {
+                    setTimeout(() => {
+                        setMessage("");
+                    }, flipDelay);
                 }
             })
             .catch((error) => {
                 console.error("Error validating the word:", error);
                 setMessage("Error validating the word. Please try again.");
             });
-    }, [currentGuess, targetWord, attempts.length, maxAttempts, updateLetterStatuses, gameOver, apiUrl]);
+    }, [currentGuess, targetWord, attempts.length, maxAttempts, updateLetterStatuses, apiUrl, startTime]);
     const handleKeyPress = useCallback((key) => {
         if (gameOver) return;
 

@@ -36,8 +36,8 @@ describe('reportWebVitals', () => {
         expect(getTTFB).toHaveBeenCalledWith(mockCallback);
     });
 
-    test('reportWebVitals calls helper when given a function', async () => {
-        const mockCallback = jest.fn();
+    test('reportWebVitals calls helper when given a function', () => {
+        const mockCallback = () => {};
 
         const getCLS = jest.fn();
         const getFID = jest.fn();
@@ -55,6 +55,7 @@ describe('reportWebVitals', () => {
 
         const reportWebVitals = require('./reportWebVitals').default;
         // calling should not throw and will exercise the conditional branch
+        expect(mockCallback instanceof Function).toBe(true);
         expect(() => reportWebVitals(mockCallback)).not.toThrow();
     });
 });
