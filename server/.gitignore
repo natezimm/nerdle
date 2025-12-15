@@ -49,6 +49,3 @@ coverage
 .vscode/
 .idea/
 .DS_Store
-
-# Lockfiles (optional: keep if you want deterministic installs)
-package-lock.json
