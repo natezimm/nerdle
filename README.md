@@ -1,5 +1,5 @@
 [![CI](https://github.com/natezimm/nerdle/actions/workflows/deploy.yml/badge.svg)](https://github.com/natezimm/nerdle/actions/workflows/deploy.yml)
-[![Coverage](https://img.shields.io/badge/coverage-checked-brightgreen)](#testing)
+[![Coverage](https://img.shields.io/badge/coverage-checked-brightgreen)](#testing--quality)
 
 # Nerdle
 
