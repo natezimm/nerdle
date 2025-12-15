@@ -1,0 +1,68 @@
+name: CI & Deploy
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
+
+      # ---------- Client (React) ----------
+      - name: Install client deps
+        working-directory: client
+        run: npm ci
+
+      - name: Client tests + coverage
+        working-directory: client
+        run: npm run test:coverage
+
+      # ---------- Server (Node.js) ----------
+      - name: Install server deps
+        working-directory: server
+        run: npm ci
+
+      - name: Server tests + coverage
+        working-directory: server
+        run: npm test
+
+  deploy:
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.LIGHTSAIL_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ${{ secrets.LIGHTSAIL_HOST }} >> ~/.ssh/known_hosts
+
+          cat <<EOF > ~/.ssh/config
+          Host lightsail
+            HostName ${{ secrets.LIGHTSAIL_HOST }}
+            User ${{ secrets.LIGHTSAIL_USER }}
+            IdentityFile ~/.ssh/id_rsa
+            StrictHostKeyChecking=no
+          EOF
+
+      - name: Deploy to Lightsail
+        run: |
+          ssh lightsail "bash ~/deploy-scripts/deploy-nerdle.sh"
