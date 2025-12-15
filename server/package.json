@@ -18,11 +18,18 @@
     "express": "^4.21.1",
     "word-list": "^4.1.0"
   },
-  "type": "module"
-  ,
+  "type": "module",
   "jest": {
     "testEnvironment": "node",
-    "transform": {}
+    "transform": {},
+    "coverageThreshold": {
+      "global": {
+        "lines": 90,
+        "statements": 85,
+        "functions": 85,
+        "branches": 80
+      }
+    }
   },
   "devDependencies": {
     "jest": "29.7.0",

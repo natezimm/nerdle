@@ -1,3 +1,6 @@
+[![CI](https://github.com/natezimm/nerdle/actions/workflows/deploy.yml/badge.svg)](https://github.com/natezimm/nerdle/actions/workflows/deploy.yml)
+[![Coverage](https://img.shields.io/badge/coverage-checked-brightgreen)](#testing)
+
 # Nerdle
 
 Nerdle is a Wordle-inspired experience that focuses on technology vocabulary. A React frontend pairs with an Express backend to serve randomized tech words, validate guesses, show letter-flip animations, and store persistent gameplay statistics.
@@ -63,7 +66,7 @@ npm install
   - `PORT` (default: `4000`)
   - `CORS_ORIGIN` – set to the client origin (e.g., `https://nerdle-client.onrender.com`) to allow browser requests in production.
 
-## Testing
+## Testing & Quality
 
 - **Client**
   ```bash
@@ -77,6 +80,14 @@ npm install
   npm test
   ```
   Jest covers the API routes, tech word list, and word list utility loader.
+
+- CI runs client and server test suites on every push to `main`
+- Code coverage is checked and enforced before deployment
+- Coverage thresholds:
+  - Lines ≥ 90%
+  - Statements ≥ 85%
+  - Functions ≥ 85%
+  - Branches ≥ 80%
 
 ## Build & Deploy
 
