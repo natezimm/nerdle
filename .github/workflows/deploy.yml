@@ -9,35 +9,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
 
-      # CLIENT TESTS + COVERAGE
-      - name: Install client dependencies
+      # ---------- CLIENT ----------
+      - name: Install client deps
         working-directory: client
         run: npm ci
 
-      - name: Run client tests with coverage
+      - name: Client tests + coverage
         working-directory: client
         run: npm run test:coverage
 
-      # SERVER TESTS
-      - name: Install server dependencies
+      # ---------- SERVER ----------
+      - name: Install server deps
         working-directory: server
         run: npm ci
 
-      - name: Run server tests
+      - name: Server tests + coverage
         working-directory: server
         run: npm test
 
-      # SSH SETUP
+      # ---------- SSH ----------
       - name: Add SSH key
         run: |
           mkdir -p ~/.ssh
@@ -54,7 +56,6 @@ jobs:
             StrictHostKeyChecking=no
           EOF
 
-      # DEPLOY
-      - name: Run remote deploy script
+      - name: Deploy
         run: |
           ssh lightsail "bash ~/deploy-scripts/deploy-${{ github.event.repository.name }}.sh"
