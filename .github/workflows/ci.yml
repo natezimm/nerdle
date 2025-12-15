@@ -1,11 +1,11 @@
-name: Deploy to Lightsail
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  deploy:
+  ci:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,24 +38,3 @@ jobs:
       - name: Server tests + coverage
         working-directory: server
         run: npm test
-
-      # ---------- SSH ----------
-      - name: Add SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.LIGHTSAIL_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          ssh-keyscan ${{ secrets.LIGHTSAIL_HOST }} >> ~/.ssh/known_hosts
-
-          cat <<EOF > ~/.ssh/config
-          Host lightsail
-            HostName ${{ secrets.LIGHTSAIL_HOST }}
-            User ${{ secrets.LIGHTSAIL_USER }}
-            IdentityFile ~/.ssh/id_rsa
-            StrictHostKeyChecking=no
-          EOF
-
-      - name: Deploy
-        run: |
-          ssh lightsail "bash ~/deploy-scripts/deploy-${{ github.event.repository.name }}.sh"
