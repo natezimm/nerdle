@@ -22,15 +22,13 @@ const App = () => {
     });
     const maxAttempts = 6;
 
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:4000';
-
     useEffect(() => {
         document.documentElement.dataset.theme = theme;
         localStorage.setItem('theme', theme);
     }, [theme]);
 
     useEffect(() => {
-        axios.get(`${apiUrl}/api/words/random`)
+        axios.get('/api/words/random')
             .then((response) => {
                 setTargetWord(response.data.word);
                 setStartTime(Date.now());
@@ -39,7 +37,7 @@ const App = () => {
                 console.error("Error fetching the word:", error);
                 setMessage("Failed to fetch the word. Please try again later.");
             });
-    }, [apiUrl]);
+    }, []);
 
     const updateLetterStatuses = useCallback((guess) => {
         const newStatuses = { ...letterStatuses };
@@ -68,7 +66,7 @@ const App = () => {
             return;
         }
 
-        axios.post(`${apiUrl}/api/words/validate`, { word: currentGuess })
+        axios.post('/api/words/validate', { word: currentGuess })
             .then((response) => {
                 if (!response.data.valid) {
                     setMessage("Invalid word. Try again.");
@@ -106,7 +104,7 @@ const App = () => {
                 console.error("Error validating the word:", error);
                 setMessage("Error validating the word. Please try again.");
             });
-    }, [currentGuess, targetWord, attempts.length, maxAttempts, updateLetterStatuses, apiUrl, startTime]);
+    }, [currentGuess, targetWord, attempts.length, maxAttempts, updateLetterStatuses, startTime]);
     const handleKeyPress = useCallback((key) => {
         if (gameOver) return;
 
