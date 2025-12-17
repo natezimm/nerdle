@@ -98,11 +98,21 @@ describe('server configuration', () => {
     expect(serverApp).toBe(appMock);
     expect(expressMock).toHaveBeenCalled();
 
-    expect(corsMock).toHaveBeenCalledWith({
-      origin: 'https://example.com',
+    expect(corsMock).toHaveBeenCalled();
+    const corsOptions = corsMock.mock.calls[0]?.[0];
+    expect(corsOptions).toBeDefined();
+    expect(corsOptions).toMatchObject({
       methods: ['GET', 'POST'],
       allowedHeaders: ['Content-Type'],
     });
+    expect(typeof corsOptions.origin).toBe('function');
+    const allowedCallback = jest.fn();
+    corsOptions.origin('https://example.com', allowedCallback);
+    expect(allowedCallback).toHaveBeenCalledWith(null, true);
+    const deniedCallback = jest.fn();
+    corsOptions.origin('https://not-allowed.com', deniedCallback);
+    expect(deniedCallback).toHaveBeenCalled();
+    expect(deniedCallback.mock.calls[0]?.[0]).toBeInstanceOf(Error);
     expect(bodyParserJson).toHaveBeenCalled();
     expect(useCalls).toEqual(['cors-middleware', 'json-middleware']);
 
@@ -172,7 +182,7 @@ describe('server configuration', () => {
     expect(corsMock).toHaveBeenCalled();
     expect(bodyParserJson).toHaveBeenCalled();
     expect(useCalls).toEqual(['cors-middleware', 'json-middleware']);
-    expect(getRoutes).toHaveLength(1);
+    expect(getRoutes).toHaveLength(2);
     expect(postRoutes).toHaveLength(1);
   });
 });
