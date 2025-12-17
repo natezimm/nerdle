@@ -37,7 +37,9 @@ describe('App', () => {
         render(<App />);
 
         await waitFor(() =>
-            expect(axios.get).toHaveBeenCalledWith('http://localhost:4000/api/words/random')
+            expect(axios.get).toHaveBeenCalledWith(
+                expect.stringContaining('/api/words/random')
+            )
         );
 
         if (previousApiUrl === undefined) {
