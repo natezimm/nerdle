@@ -1,8 +1,64 @@
+/* Theme tokens */
+:root {
+  --color-bg: #ffffff;
+  --color-text: #111111;
+
+  --icon-button-bg: #787c7e;
+  --icon-button-hover-bg: #565758;
+  --icon-button-color: #ffffff;
+
+  --tile-text: #000000;
+  --tile-border-empty: #d3d6da;
+  --tile-border-filled: #878a8c;
+  --tile-reveal-bg: #d3d6da;
+
+  --key-bg: #d3d6da;
+  --key-text: #000000;
+  --backspace-fill: #000000;
+
+  --status-absent-bg: #787c7e;
+
+  --modal-bg: #ffffff;
+  --modal-text: #111111;
+  --modal-border: #d3d6da;
+  --modal-close: #555555;
+  --modal-close-hover: #111111;
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #121213;
+  --color-text: #d7dadc;
+
+  --icon-button-bg: #3a3a3c;
+  --icon-button-hover-bg: #565758;
+  --icon-button-color: #ffffff;
+
+  --tile-text: #d7dadc;
+  --tile-border-empty: #3a3a3c;
+  --tile-border-filled: #565758;
+  --tile-reveal-bg: #3a3a3c;
+
+  --key-bg: #818384;
+  --key-text: #ffffff;
+  --backspace-fill: #ffffff;
+
+  --status-absent-bg: #3a3a3c;
+
+  --modal-bg: #121213;
+  --modal-text: #ffffff;
+  --modal-border: #3a3a3c;
+  --modal-close: #818384;
+  --modal-close-hover: #ffffff;
+}
+
 body {
   margin: 0;
   font-family: "Libre Franklin", cursive;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transition: background-color 150ms ease, color 150ms ease;
 }
 
 code {

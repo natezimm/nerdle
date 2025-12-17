@@ -17,8 +17,8 @@
     font-weight: bold;
     text-transform: uppercase;
     border: none;
-    background-color: #d3d6da;
-    color: #000000;
+    background-color: var(--key-bg);
+    color: var(--key-text);
     border-radius: 4px;
     cursor: pointer;
     display: flex;
@@ -46,12 +46,12 @@
 }
 
 .key.absent {
-    background-color: #787c7e;
+    background-color: var(--status-absent-bg);
     color: white;
 }
 
 .backspace-icon {
-    fill: #000;
+    fill: var(--backspace-fill);
 }
 
 @media (max-width: 600px) {

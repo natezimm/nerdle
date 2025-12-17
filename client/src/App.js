@@ -15,9 +15,25 @@ const App = () => {
     const [gameOver, setGameOver] = useState(false);
     const [isStatsOpen, setIsStatsOpen] = useState(false);
     const [startTime, setStartTime] = useState(null);
+    const [theme, setTheme] = useState(() => {
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme === 'light' || storedTheme === 'dark') return storedTheme;
+
+        const prefersDark =
+            typeof window !== 'undefined' &&
+            typeof window.matchMedia === 'function' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        return prefersDark ? 'dark' : 'light';
+    });
     const maxAttempts = 6;
 
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+
+    useEffect(() => {
+        document.documentElement.dataset.theme = theme;
+        localStorage.setItem('theme', theme);
+    }, [theme]);
 
     useEffect(() => {
         axios.get(`${apiUrl}/api/words/random`)
@@ -121,6 +137,13 @@ const App = () => {
                 <h1>Nerdle</h1>
                 <button className="stats-button" onClick={() => setIsStatsOpen(true)} aria-label="Statistics">
                     <i className="fa-solid fa-trophy"></i>
+                </button>
+                <button
+                    className="theme-button"
+                    onClick={() => setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'))}
+                    aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                >
+                    <i className={theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon'}></i>
                 </button>
             </div>
             <StatsModal isOpen={isStatsOpen} onClose={() => setIsStatsOpen(false)} />

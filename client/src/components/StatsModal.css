@@ -12,14 +12,14 @@
 }
 
 .modal-content {
-    background-color: #121213;
-    color: white;
+    background-color: var(--modal-bg);
+    color: var(--modal-text);
     padding: 20px;
     border-radius: 8px;
     width: 90%;
     max-width: 500px;
     box-shadow: 0 4px 23px 0 rgba(0, 0, 0, 0.2);
-    border: 1px solid #3a3a3c;
+    border: 1px solid var(--modal-border);
     font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -40,14 +40,14 @@
 .close-button {
     background: none;
     border: none;
-    color: #818384;
+    color: var(--modal-close);
     font-size: 24px;
     cursor: pointer;
     line-height: 1;
 }
 
 .close-button:hover {
-    color: white;
+    color: var(--modal-close-hover);
 }
 
 .stats-grid {
@@ -75,7 +75,7 @@
 }
 
 .stats-details {
-    border-top: 1px solid #3a3a3c;
+    border-top: 1px solid var(--modal-border);
     padding-top: 16px;
 }
 

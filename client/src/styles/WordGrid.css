@@ -12,9 +12,9 @@
     align-items: center;
     font-size: 2rem;
     font-weight: bold;
-    border: 2px solid #3a3a3c;
+    border: 2px solid var(--tile-border-empty);
     text-transform: uppercase;
-    color: #000000;
+    color: var(--tile-text);
     transition: background-color 0.3s ease;
 }
 
@@ -23,17 +23,17 @@
 }
 
 .letter-empty {
-    border: 2px solid #d3d6da;
+    border-color: var(--tile-border-empty);
 }
 
 .letter-filled {
-    border: 2px solid #878a8c;
+    border-color: var(--tile-border-filled);
 }
 
 .correct-initial,
 .present-initial,
 .absent-initial {
-    background-color: #d3d6da;
+    background-color: var(--tile-reveal-bg);
 }
 
 .correct-final {
@@ -49,7 +49,8 @@
 }
 
 .absent-final {
-    background-color: #787c7e;
+    background-color: var(--status-absent-bg);
+    border: 2px solid var(--status-absent-bg);
     color: #fff;
 }
 
