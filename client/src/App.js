@@ -18,13 +18,7 @@ const App = () => {
     const [theme, setTheme] = useState(() => {
         const storedTheme = localStorage.getItem('theme');
         if (storedTheme === 'light' || storedTheme === 'dark') return storedTheme;
-
-        const prefersDark =
-            typeof window !== 'undefined' &&
-            typeof window.matchMedia === 'function' &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        return prefersDark ? 'dark' : 'light';
+        return 'light';
     });
     const maxAttempts = 6;
 
