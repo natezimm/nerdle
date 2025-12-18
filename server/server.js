@@ -2,8 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import techWords from './techWords.js';
-import fiveLetterWords from './utils.js';
+import techWords, { techWordsByLength } from './techWords.js';
+import { fourLetterWords, fiveLetterWords, sixLetterWords } from './utils.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -27,6 +27,14 @@ const corsOptions = {
             return callback(null, true);
         }
 
+        // In non-production, allow localhost/loopback with any port (CRA, Vite, previews, etc.)
+        if (process.env.NODE_ENV !== 'production') {
+            const localhostPattern = /^http:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?$/;
+            if (localhostPattern.test(origin)) {
+                return callback(null, true);
+            }
+        }
+
         return callback(new Error('Not allowed by CORS'));
     },
     methods: ['GET', 'POST'],
@@ -41,13 +49,26 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.get('/api/words/random', (req, res) => {
-    const randomWord = techWords[Math.floor(Math.random() * techWords.length)];
+    const requestedLength = Number(req.query?.length);
+    const wordLength = [4, 5, 6].includes(requestedLength) ? requestedLength : 5;
+    const wordPool = techWordsByLength[wordLength] ?? techWords;
+    const randomWord = wordPool[Math.floor(Math.random() * wordPool.length)];
     res.json({ word: randomWord });
 });
 
 app.post('/api/words/validate', (req, res) => {
-    const { word } = req.body;
-    const isValid = fiveLetterWords.includes(word) || techWords.includes(word);
+    const normalized = String(req.body?.word ?? '').toLowerCase();
+    const wordLength = normalized.length;
+
+    const wordListsByLength = {
+        4: fourLetterWords,
+        5: fiveLetterWords,
+        6: sixLetterWords,
+    };
+
+    const dictionaryWords = wordListsByLength[wordLength] ?? [];
+    const techWordPool = techWordsByLength[wordLength] ?? [];
+    const isValid = dictionaryWords.includes(normalized) || techWordPool.includes(normalized);
     res.json({ valid: isValid });
 });
 

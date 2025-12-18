@@ -229,7 +229,7 @@ describe('App', () => {
             act(() => {
                 jest.advanceTimersByTime(2000);
             });
-            expect(updateStats).toHaveBeenCalledWith(true, 1, 0);
+            expect(updateStats).toHaveBeenCalledWith(true, 1, 0, 5);
         } finally {
             nowSpy.mockRestore();
         }
@@ -248,7 +248,7 @@ describe('App', () => {
         act(() => {
             jest.advanceTimersByTime(2000);
         });
-        expect(updateStats).toHaveBeenCalledWith(false, 6, null);
+        expect(updateStats).toHaveBeenCalledWith(false, 6, null, 5);
         expect(screen.getByText(/Game over! The word was apple\./i)).toBeInTheDocument();
     });
 });

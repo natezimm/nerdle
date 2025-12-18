@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/WordGrid.css';
 
-const WordGrid = ({ attempts, currentGuess, targetWord }) => {
+const WordGrid = ({ attempts, currentGuess, targetWord, wordLength = 5 }) => {
     const totalRows = 6;
-    const wordLength = 5;
     const [flippedLetters, setFlippedLetters] = useState([]);
     const [persistedStatuses, setPersistedStatuses] = useState({});
     const [flippingRow, setFlippingRow] = useState(null);
+
+    useEffect(() => {
+        setFlippedLetters([]);
+        setPersistedStatuses({});
+        setFlippingRow(null);
+    }, [wordLength, targetWord]);
 
     useEffect(() => {
         if (attempts.length > 0) {
@@ -22,7 +27,7 @@ const WordGrid = ({ attempts, currentGuess, targetWord }) => {
                 delay += 300; // Delay between flips
             }
         }
-    }, [attempts]);
+    }, [attempts, wordLength]);
 
     const getLetterStatus = (letter, index) => {
         if (targetWord[index] === letter) return "correct";
@@ -45,7 +50,7 @@ const WordGrid = ({ attempts, currentGuess, targetWord }) => {
             setPersistedStatuses(newStatuses);
             setFlippingRow(null); // Reset flipping row
         }
-    }, [flippedLetters, attempts, flippingRow, getLetterStatus, persistedStatuses]);
+    }, [flippedLetters, attempts, flippingRow, getLetterStatus, persistedStatuses, wordLength]);
 
     const getFlipClasses = (statusClass, rowIndex, letterIndex) => {
         const isPersisted = persistedStatuses[rowIndex]?.[letterIndex];

@@ -2,17 +2,20 @@ import React from 'react';
 import './StatsModal.css';
 import { getStats, formatTime } from '../utils/stats';
 
-const StatsModal = ({ isOpen, onClose }) => {
+const StatsModal = ({ isOpen, onClose, wordLength = 5 }) => {
     if (!isOpen) return null;
 
-    const stats = getStats();
+    const stats = getStats(wordLength);
     const winRate = stats.totalGames > 0 ? Math.round((stats.wins / stats.totalGames) * 100) : 0;
 
     return (
         <div className="modal-overlay">
             <div className="modal-content">
                 <div className="modal-header">
-                    <h2>Statistics</h2>
+                    <div>
+                        <h2>Statistics</h2>
+                        <div className="stats-mode">{wordLength}-letter</div>
+                    </div>
                     <button className="close-button" onClick={onClose}>&times;</button>
                 </div>
                 <div className="stats-grid">

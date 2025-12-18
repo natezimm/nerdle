@@ -6,7 +6,7 @@ describe('stats utility helpers', () => {
     });
 
     test('returns defaults when no stats are saved', () => {
-        const stats = getStats();
+        const stats = getStats(5);
         expect(stats).toEqual({
             totalGames: 0,
             wins: 0,
@@ -16,7 +16,7 @@ describe('stats utility helpers', () => {
             fewestGuesses: null,
         });
 
-        const stored = {
+        const storedLegacy = {
             totalGames: 2,
             wins: 1,
             currentStreak: 1,
@@ -24,12 +24,20 @@ describe('stats utility helpers', () => {
             fastestSolveTime: 3000,
             fewestGuesses: 4,
         };
-        localStorage.setItem('nerdle-stats', JSON.stringify(stored));
-        expect(getStats()).toEqual(stored);
+        localStorage.setItem('nerdle-stats', JSON.stringify(storedLegacy));
+        expect(getStats(5)).toEqual(storedLegacy);
+        expect(getStats(4)).toEqual({
+            totalGames: 0,
+            wins: 0,
+            currentStreak: 0,
+            longestStreak: 0,
+            fastestSolveTime: null,
+            fewestGuesses: null,
+        });
     });
 
     test('updateStats tracks wins, streaks, and bests', () => {
-        const firstWin = updateStats(true, 4, 5000);
+        const firstWin = updateStats(true, 4, 5000, 5);
         expect(firstWin.totalGames).toBe(1);
         expect(firstWin.wins).toBe(1);
         expect(firstWin.currentStreak).toBe(1);
@@ -37,18 +45,23 @@ describe('stats utility helpers', () => {
         expect(firstWin.fastestSolveTime).toBe(5000);
         expect(firstWin.fewestGuesses).toBe(4);
 
-        const secondWin = updateStats(true, 3, 4000);
+        const secondWin = updateStats(true, 3, 4000, 5);
         expect(secondWin.totalGames).toBe(2);
         expect(secondWin.wins).toBe(2);
         expect(secondWin.currentStreak).toBe(2);
         expect(secondWin.longestStreak).toBe(2);
         expect(secondWin.fastestSolveTime).toBe(4000);
         expect(secondWin.fewestGuesses).toBe(3);
+
+        const otherLengthWin = updateStats(true, 2, 3500, 4);
+        expect(otherLengthWin.totalGames).toBe(1);
+        expect(otherLengthWin.wins).toBe(1);
+        expect(getStats(5).totalGames).toBe(2);
     });
 
     test('losses reset the current streak without altering bests', () => {
-        updateStats(true, 3, 3000);
-        const afterLoss = updateStats(false, 5, null);
+        updateStats(true, 3, 3000, 5);
+        const afterLoss = updateStats(false, 5, null, 5);
         expect(afterLoss.totalGames).toBe(2);
         expect(afterLoss.wins).toBe(1);
         expect(afterLoss.currentStreak).toBe(0);
@@ -66,9 +79,33 @@ describe('stats utility helpers', () => {
             fastestSolveTime: 3000,
             fewestGuesses: 3,
         };
-        localStorage.setItem('nerdle-stats', JSON.stringify(existingStats));
+        localStorage.setItem(
+            'nerdle-stats',
+            JSON.stringify({
+                version: 2,
+                byLength: {
+                    4: {
+                        totalGames: 0,
+                        wins: 0,
+                        currentStreak: 0,
+                        longestStreak: 0,
+                        fastestSolveTime: null,
+                        fewestGuesses: null,
+                    },
+                    5: existingStats,
+                    6: {
+                        totalGames: 0,
+                        wins: 0,
+                        currentStreak: 0,
+                        longestStreak: 0,
+                        fastestSolveTime: null,
+                        fewestGuesses: null,
+                    },
+                },
+            })
+        );
 
-        const updated = updateStats(true, 4, 5000);
+        const updated = updateStats(true, 4, 5000, 5);
         expect(updated.totalGames).toBe(11);
         expect(updated.wins).toBe(6);
         expect(updated.currentStreak).toBe(1);

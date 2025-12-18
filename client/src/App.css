@@ -29,7 +29,7 @@
 }
 
 .stats-button,
-.theme-button {
+.settings-button {
   background-color: var(--icon-button-bg);
   border: none;
   cursor: pointer;
@@ -47,13 +47,13 @@
 }
 
 .stats-button:hover,
-.theme-button:hover {
+.settings-button:hover {
   background-color: var(--icon-button-hover-bg);
   transform: scale(1.05);
   color: var(--icon-button-color);
 }
 
 .stats-button:active,
-.theme-button:active {
+.settings-button:active {
   transform: scale(0.95);
 }

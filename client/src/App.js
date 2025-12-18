@@ -3,6 +3,7 @@ import axios from 'axios';
 import WordGrid from './components/WordGrid';
 import Keyboard from './components/Keyboard';
 import StatsModal from './components/StatsModal';
+import SettingsModal from './components/SettingsModal';
 import { updateStats } from './utils/stats';
 import './App.css';
 
@@ -14,7 +15,13 @@ const App = () => {
     const [letterStatuses, setLetterStatuses] = useState({});
     const [gameOver, setGameOver] = useState(false);
     const [isStatsOpen, setIsStatsOpen] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [startTime, setStartTime] = useState(null);
+    const [wordLength, setWordLength] = useState(() => {
+        const storedLength = Number(localStorage.getItem('wordLength'));
+        if ([4, 5, 6].includes(storedLength)) return storedLength;
+        return 5;
+    });
     const [theme, setTheme] = useState(() => {
         const storedTheme = localStorage.getItem('theme');
         if (storedTheme === 'light' || storedTheme === 'dark') return storedTheme;
@@ -28,7 +35,19 @@ const App = () => {
     }, [theme]);
 
     useEffect(() => {
-        axios.get('/api/words/random')
+        localStorage.setItem('wordLength', String(wordLength));
+    }, [wordLength]);
+
+    useEffect(() => {
+        setAttempts([]);
+        setCurrentGuess("");
+        setMessage("");
+        setLetterStatuses({});
+        setGameOver(false);
+        setTargetWord("");
+        setIsStatsOpen(false);
+
+        axios.get(`/api/words/random?length=${wordLength}`)
             .then((response) => {
                 setTargetWord(response.data.word);
                 setStartTime(Date.now());
@@ -37,7 +56,7 @@ const App = () => {
                 console.error("Error fetching the word:", error);
                 setMessage("Failed to fetch the word. Please try again later.");
             });
-    }, []);
+    }, [wordLength]);
 
     const updateLetterStatuses = useCallback((guess) => {
         const newStatuses = { ...letterStatuses };
@@ -61,8 +80,8 @@ const App = () => {
     }, [letterStatuses, targetWord]);
 
     const submitGuess = useCallback(() => {
-        if (currentGuess.length !== 5) {
-            setMessage("Guess must be 5 letters.");
+        if (currentGuess.length !== wordLength) {
+            setMessage(`Guess must be ${wordLength} letters.`);
             return;
         }
 
@@ -82,14 +101,14 @@ const App = () => {
                 if (currentGuess === targetWord) {
                     setTimeout(() => {
                         const timeTaken = Date.now() - startTime;
-                        updateStats(true, attempts.length + 1, timeTaken);
+                        updateStats(true, attempts.length + 1, timeTaken, wordLength);
                         setMessage("Congratulations! You've guessed the word.");
                         setGameOver(true);
                         setIsStatsOpen(true);
                     }, flipDelay);
                 } else if (attempts.length + 1 >= maxAttempts) {
                     setTimeout(() => {
-                        updateStats(false, maxAttempts, null);
+                        updateStats(false, maxAttempts, null, wordLength);
                         setMessage(`Game over! The word was ${targetWord}.`);
                         setGameOver(true);
                         setIsStatsOpen(true);
@@ -104,7 +123,7 @@ const App = () => {
                 console.error("Error validating the word:", error);
                 setMessage("Error validating the word. Please try again.");
             });
-    }, [currentGuess, targetWord, attempts.length, maxAttempts, updateLetterStatuses, startTime]);
+    }, [currentGuess, targetWord, attempts.length, maxAttempts, updateLetterStatuses, startTime, wordLength]);
     const handleKeyPress = useCallback((key) => {
         if (gameOver) return;
 
@@ -112,10 +131,10 @@ const App = () => {
             submitGuess();
         } else if (key === "Backspace") {
             setCurrentGuess((prev) => prev.slice(0, -1));
-        } else if (/^[a-zA-Z]$/.test(key) && currentGuess.length < 5) {
+        } else if (/^[a-zA-Z]$/.test(key) && currentGuess.length < wordLength) {
             setCurrentGuess((prev) => prev + key.toLowerCase()); // Add the key to the current guess
         }
-    }, [submitGuess, currentGuess, gameOver]);
+    }, [submitGuess, currentGuess, gameOver, wordLength]);
 
     useEffect(() => {
         const handleKeyDown = (event) => handleKeyPress(event.key);
@@ -131,15 +150,23 @@ const App = () => {
                     <i className="fa-solid fa-trophy"></i>
                 </button>
                 <button
-                    className="theme-button"
-                    onClick={() => setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'))}
-                    aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                    className="settings-button"
+                    onClick={() => setIsSettingsOpen(true)}
+                    aria-label="Settings"
                 >
-                    <i className={theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon'}></i>
+                    <i className="fa-solid fa-gear"></i>
                 </button>
             </div>
-            <StatsModal isOpen={isStatsOpen} onClose={() => setIsStatsOpen(false)} />
-            <WordGrid attempts={attempts} currentGuess={currentGuess} targetWord={targetWord} />
+            <StatsModal isOpen={isStatsOpen} onClose={() => setIsStatsOpen(false)} wordLength={wordLength} />
+            <SettingsModal
+                isOpen={isSettingsOpen}
+                onClose={() => setIsSettingsOpen(false)}
+                theme={theme}
+                onToggleTheme={() => setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'))}
+                wordLength={wordLength}
+                onWordLengthChange={(len) => setWordLength(len)}
+            />
+            <WordGrid attempts={attempts} currentGuess={currentGuess} targetWord={targetWord} wordLength={wordLength} />
             <p>{message}</p>
             <Keyboard onKeyPress={handleKeyPress} letterStatuses={letterStatuses} />        </div>
     );

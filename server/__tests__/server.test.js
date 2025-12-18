@@ -107,6 +107,9 @@ describe('server configuration', () => {
     });
     expect(typeof corsOptions.origin).toBe('function');
     const allowedCallback = jest.fn();
+    const noOriginCallback = jest.fn();
+    corsOptions.origin(undefined, noOriginCallback);
+    expect(noOriginCallback).toHaveBeenCalledWith(null, true);
     corsOptions.origin('https://example.com', allowedCallback);
     expect(allowedCallback).toHaveBeenCalledWith(null, true);
     const deniedCallback = jest.fn();
@@ -116,6 +119,15 @@ describe('server configuration', () => {
     expect(bodyParserJson).toHaveBeenCalled();
     expect(useCalls).toEqual(['cors-middleware', 'json-middleware']);
 
+    const healthRoute = getRoutes.find(route => route.path === '/api/health');
+    expect(healthRoute).toBeDefined();
+    const healthHandler = healthRoute?.handler;
+    expect(healthHandler).toBeDefined();
+    const healthRes = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+    healthHandler?.({}, healthRes);
+    expect(healthRes.status).toHaveBeenCalledWith(200);
+    expect(healthRes.json).toHaveBeenCalledWith({ status: 'ok' });
+
     const randomRoute = getRoutes.find(route => route.path === '/api/words/random');
     expect(randomRoute).toBeDefined();
     const randomHandler = randomRoute?.handler;
@@ -123,8 +135,11 @@ describe('server configuration', () => {
     const randomRes = { json: jest.fn() };
     const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
     randomHandler?.({}, randomRes);
+    const randomResFour = { json: jest.fn() };
+    randomHandler?.({ query: { length: '4' } }, randomResFour);
     randomSpy.mockRestore();
     expect(randomRes.json).toHaveBeenCalledWith({ word: 'admin' });
+    expect(randomResFour.json).toHaveBeenCalledWith({ word: 'bash' });
 
     const validateRoute = postRoutes.find(route => route.path === '/api/words/validate');
     expect(validateRoute).toBeDefined();
@@ -133,9 +148,15 @@ describe('server configuration', () => {
     const validRes = { json: jest.fn() };
     validateHandler?.({ body: { word: 'apple' } }, validRes);
     expect(validRes.json).toHaveBeenCalledWith({ valid: true });
+    const validResFour = { json: jest.fn() };
+    validateHandler?.({ body: { word: 'bash' } }, validResFour);
+    expect(validResFour.json).toHaveBeenCalledWith({ valid: true });
     const invalidRes = { json: jest.fn() };
     validateHandler?.({ body: { word: 'zzzzz' } }, invalidRes);
     expect(invalidRes.json).toHaveBeenCalledWith({ valid: false });
+    const invalidResUnsupported = { json: jest.fn() };
+    validateHandler?.({ body: { word: 'ab' } }, invalidResUnsupported);
+    expect(invalidResUnsupported.json).toHaveBeenCalledWith({ valid: false });
 
     expect(listenSpy).toHaveBeenCalledWith('5555', expect.any(Function));
     const listenCallback = listenSpy.mock.calls[0]?.[1];

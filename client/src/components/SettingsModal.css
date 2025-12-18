@@ -1,0 +1,81 @@
+.settings-section {
+    border-top: 1px solid var(--modal-border);
+    padding-top: 16px;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.settings-row-multi {
+    align-items: flex-start;
+}
+
+.settings-label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.settings-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: var(--icon-button-bg);
+    border: none;
+    cursor: pointer;
+    color: var(--icon-button-color);
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.settings-action:hover {
+    background-color: var(--icon-button-hover-bg);
+    transform: scale(1.03);
+}
+
+.settings-action:active {
+    transform: scale(0.98);
+}
+
+.settings-action-text {
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.settings-options {
+    display: flex;
+    gap: 8px;
+}
+
+.settings-option {
+    width: 44px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--modal-border);
+    background-color: transparent;
+    color: var(--modal-text);
+    cursor: pointer;
+    font-weight: 700;
+    transition: transform 0.1s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.settings-option:hover {
+    background-color: rgba(127, 127, 127, 0.12);
+    transform: scale(1.03);
+}
+
+.settings-option.selected {
+    background-color: var(--icon-button-bg);
+    border-color: var(--icon-button-bg);
+    color: var(--icon-button-color);
+}
+
