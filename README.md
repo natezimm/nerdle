@@ -5,66 +5,65 @@
 
 Nerdle is a Wordle-inspired experience that focuses on technology vocabulary. A React frontend pairs with an Express backend to serve randomized tech words, validate guesses, show letter-flip animations, and store persistent gameplay statistics.
 
+Live: `https://nerdle.nathanzimmerman.com`
+
 ## Features
 
-- **Daily challenge feel**: Players have six attempts to guess a five-letter tech word, with animated flip cards revealing correct, present, or absent letters.
-- **Interactive keyboard**: The on-screen keyboard mirrors letter statuses from each guess so feedback stays visible even when using a physical keyboard.
-- **Persistent statistics**: The trophy button opens a modal that summarizes total games, win percentage, streaks, fastest solve time, and fewest guesses; stats are stored in `localStorage`.
-- **Robust validation**: The server checks each guess against both the curated tech word list and the npm `word-list` package to ensure players submit real words.
+- **4/5/6-letter games**: Choose word length from the settings modal; each new game fetches a random tech word of that length.
+- **Animated feedback**: Tile flip animations reveal correct/present/absent letters; results also apply to the on-screen keyboard.
+- **Stats (per word length)**: Trophy modal shows games played, win %, current/max streak, fastest solve time, and fewest guesses (stored in `localStorage`).
+- **Theme toggle**: Light/dark mode, persisted in `localStorage`.
+- **Server-side guess validation**: A guess is valid if it’s either in the curated tech list or the `word-list` dictionary for that word length.
 
 ## Tech Stack
 
-- **Client**: React, Axios, React Scripts, custom CSS for animations.
-- **Server**: Node.js, Express, `word-list` word dictionary, CORS and body parsing middleware.
-- **Hosting**: Render (static site for the client, web service for the API).
+- **Client**: React (CRA), Axios, Testing Library / Jest.
+- **Server**: Node.js (ESM, Node 22), Express, `word-list`, Jest + Supertest.
+- **Deploy**: GitHub Actions + AWS Lightsail (via SSH).
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (recommended 18+)
+- Node.js 22 (see `.nvmrc`)
 - npm (bundled with Node.js)
 
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/nerdle.git
+git clone https://github.com/natezimm/nerdle.git
 cd nerdle
 ```
 
 Install dependencies for each app:
 
 ```bash
-cd server
-npm install
-cd ../client
-npm install
+cd client && npm ci
+cd ../server && npm ci
 ```
 
 ### Running Locally
 
-1. **Server**
+1. **Server** (port `4000`)
    ```bash
    cd server
    npm start
    ```
    The server listens on `http://localhost:4000` by default and exposes the API used by the client.
 
-2. **Client**
+2. **Client** (port `3000`)
    ```bash
    cd client
    npm start
    ```
-   The React app runs on `http://localhost:3000` and proxies API requests to the backend.
+   The React app runs on `http://localhost:3000` and proxies `/api` requests to `http://localhost:4000` (see `client/package.json`).
 
 ### Environment Variables
 
-- **Client**
-  - `REACT_APP_API_URL` (default: `http://localhost:4000`) – point the client to a different backend in development or production.
-
 - **Server**
   - `PORT` (default: `4000`)
-  - `CORS_ORIGIN` – set to the client origin (e.g., `https://nerdle-client.onrender.com`) to allow browser requests in production.
+  - `CORS_ORIGIN` – additional allowed origin for browsers (optional)
+  - `NODE_ENV` – set to `production` in production
 
 ## Testing & Quality
 
@@ -79,7 +78,7 @@ npm install
   cd server
   npm test
   ```
-  Jest covers the API routes, tech word list, and word list utility loader.
+  Jest covers the API routes, tech word list, and word list loader (ESM tests run with `--experimental-vm-modules`).
 
 - CI runs client and server test suites on every push to `main`
 - Code coverage is checked and enforced before deployment
@@ -98,29 +97,20 @@ npm install
   ```
   The build output lands in `client/build`.
 
-- **Server production workflow**
-  ```bash
-  cd server
-  npm run build  # builds the client and outputs static assets
-  npm start      # serves the API and static bundle (Render config)
-  ```
-
-Render configuration:
-
-- **Client**: static site
-  - Build command: `npm run build`
-  - Publish directory: `build`
-- **Server**: web service
-  - Start command: `npm start`
-  - Root directory: `server`
+- **Deploy (Lightsail)**
+  - GitHub Actions runs CI, then SSHes into a Lightsail instance and runs `~/deploy-scripts/deploy-nerdle.sh`.
+  - The workflow also checks `GET /` and `GET /api/health` after deploy (see `.github/workflows/deploy.yml`).
 
 ## API Endpoints
 
+- `GET /api/health`  
+  Returns `{ "status": "ok" }`.
+
 - `GET /api/words/random`  
-  Returns a random word from `server/techWords.js`.
+  Returns a random tech word. Supports `?length=4|5|6` (default: `5`).
 
 - `POST /api/words/validate`  
-  Validates a lowercase guess against both the curated tech list and the five-letter dictionary sourced from the `word-list` package.  
+  Validates a guess against both the curated tech list and the `word-list` dictionary for the submitted word length.  
   Request body: `{ "word": "guess" }`  
   Response: `{ "valid": true || false }`
 
@@ -128,5 +118,5 @@ Render configuration:
 
 - Submit guesses by typing on your keyboard, using the on-screen keyboard, or clicking `Enter`/`Backspace`.
 - Letter tiles animate with a flip sequence and persist their status to help guide future guesses.
-- Tap the trophy button to review how many games you have played, your win rate, streaks, fastest solve time, and fewest guesses.
-
+- Tap the trophy button to review stats for the current word length.
+- Tap the gear button to switch theme and word length.
