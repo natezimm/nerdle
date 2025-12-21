@@ -95,8 +95,8 @@ describe('App', () => {
             act(() => {
                 jest.advanceTimersByTime(2000);
             });
-            expect(await screen.findByText(/Congratulations!/i).catch(() => null)).not.toBeInTheDocument();
-            expect(await screen.findByText('Statistics')).toBeInTheDocument();
+            expect(await screen.findByText(/Congratulations!/i)).toBeInTheDocument();
+            expect(screen.queryByText('Statistics')).not.toBeInTheDocument();
             expect(axios.post).toHaveBeenCalledTimes(1);
             await typeKeys('{Enter}');
             expect(axios.post).toHaveBeenCalledTimes(1);
@@ -249,6 +249,6 @@ describe('App', () => {
             jest.advanceTimersByTime(2000);
         });
         expect(updateStats).toHaveBeenCalledWith(false, 6, null, 5);
-        expect(screen.queryByText(/Game over! The word was apple\./i)).not.toBeInTheDocument();
+        expect(screen.getByText(/Game over! The word was apple\./i)).toBeInTheDocument();
     });
 });

@@ -103,16 +103,16 @@ const App = () => {
                     setTimeout(() => {
                         const timeTaken = Date.now() - startTime;
                         updateStats(true, attempts.length + 1, timeTaken, wordLength);
-                        // setMessage("Congratulations! You've guessed the word."); // Suppressed for modal
+                        setMessage("Congratulations! You've guessed the word.");
                         setGameOver(true);
-                        setIsStatsOpen(true);
+                        // setIsStatsOpen(true);
                     }, flipDelay);
                 } else if (attempts.length + 1 >= maxAttempts) {
                     setTimeout(() => {
                         updateStats(false, maxAttempts, null, wordLength);
-                        // setMessage(`Game over! The word was ${targetWord}.`); // Suppressed for modal
+                        setMessage(`Game over! The word was ${targetWord}.`);
                         setGameOver(true);
-                        setIsStatsOpen(true);
+                        // setIsStatsOpen(true);
                     }, flipDelay);
                 } else {
                     setTimeout(() => {
