@@ -1,12 +1,16 @@
 .word-row {
     display: flex;
     justify-content: center;
-    margin: 5px 0;
+    margin-bottom: 5px;
+    gap: 5px;
+    flex-shrink: 1;
 }
 
 .letter {
-    width: 55px;
-    height: 55px;
+    width: auto;
+    max-width: 60px;
+    aspect-ratio: 1 / 1;
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,9 +22,13 @@
     transition: background-color 0.3s ease;
 }
 
-.letter:nth-child(2n) {
-    margin: 0 5px;
+@media (max-width: 350px) {
+    .letter {
+        font-size: 1.5rem;
+    }
 }
+
+
 
 .letter-empty {
     border-color: var(--tile-border-empty);

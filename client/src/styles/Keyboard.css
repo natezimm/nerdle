@@ -2,18 +2,29 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    width: 100%;
+    max-width: 500px;
+    /* Prevent being too wide on desktop */
+    padding: 0 8px;
+    /* Safe padding for edges */
+    box-sizing: border-box;
+    margin-bottom: 5px;
 }
 
 .keyboard-row {
     display: flex;
     justify-content: center;
     gap: 6px;
+    /* Restored larger gap */
+    width: 100%;
+    margin: 0 auto;
 }
 
 .key {
-    width: 40px;
+    flex: 1;
+    /* Grow to fill space */
     height: 58px;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     font-weight: bold;
     text-transform: uppercase;
     border: none;
@@ -24,15 +35,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    min-width: 0;
+    /* Allow shrinking below content size if needed */
+    padding: 0;
 }
 
 .key-wide {
-    width: 80px;
-    font-size: 0.85rem;
+    flex: 1.5;
+    /* Enter/Backspace should be larger */
+    font-size: 0.75rem;
 }
 
 .half-spacer {
-    width: 20px;
+    flex: 0.5;
 }
 
 .key.correct {
@@ -56,21 +71,15 @@
 
 @media (max-width: 600px) {
     .key {
-        width: 30px;
-        height: 45px;
         font-size: 1rem;
     }
 
     .key-wide {
-        width: 60px;
         font-size: 0.75rem;
     }
 
     .keyboard-row {
         gap: 4px;
-    }
-
-    .keyboard {
-        gap: 6px;
+        /* Slightly tighter on mobile but still distinct */
     }
 }

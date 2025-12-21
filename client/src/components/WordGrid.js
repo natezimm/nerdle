@@ -62,33 +62,54 @@ const WordGrid = ({ attempts, currentGuess, targetWord, wordLength = 5 }) => {
     };
 
     return (
-        <div className="word-grid">
-            {Array.from({ length: totalRows }).map((_, rowIndex) => {
-                const isCurrentRow = rowIndex === attempts.length;
-                const guess = isCurrentRow ? currentGuess : attempts[rowIndex] || "";
+        /* Outer container: fills available flexible space in parent, centers content */
+        <div className="word-grid-container" style={{
+            flex: 1,
+            minHeight: 0,
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center', /* Center vertically */
+            justifyContent: 'center', /* Center horizontally */
+            /* overflow: 'hidden', Removed to prevent clipping borders */
+            padding: '10px' /* Prevent edge clipping */
+        }}>
+            {/* Inner container: maintains aspect ratio and clamps sizing */}
+            <div className="word-grid word-grid-aspect" style={{
+                width: '100%',
+                maxWidth: '350px',
+                aspectRatio: '5/6',
+                maxHeight: '92%', /* Balanced buffer for spacing */
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
+            }}>
+                {Array.from({ length: totalRows }).map((_, rowIndex) => {
+                    const isCurrentRow = rowIndex === attempts.length;
+                    const guess = isCurrentRow ? currentGuess : attempts[rowIndex] || "";
 
-                return (
-                    <div key={rowIndex} className="word-row">
-                        {Array.from({ length: wordLength }).map((_, letterIndex) => {
-                            const letter = guess[letterIndex] || "";
-                            const statusClass = !isCurrentRow && letter ? getLetterStatus(letter, letterIndex) : "";
-                            const filledClass = letter ? "letter-filled" : "letter-empty";
-                            const flipClass = statusClass
-                                ? getFlipClasses(statusClass, rowIndex, letterIndex)
-                                : "";
+                    return (
+                        <div key={rowIndex} className="word-row">
+                            {Array.from({ length: wordLength }).map((_, letterIndex) => {
+                                const letter = guess[letterIndex] || "";
+                                const statusClass = !isCurrentRow && letter ? getLetterStatus(letter, letterIndex) : "";
+                                const filledClass = letter ? "letter-filled" : "letter-empty";
+                                const flipClass = statusClass
+                                    ? getFlipClasses(statusClass, rowIndex, letterIndex)
+                                    : "";
 
-                            return (
-                                <span
-                                    key={letterIndex}
-                                    className={`letter ${filledClass} ${flipClass}`}
-                                >
-                                    {letter}
-                                </span>
-                            );
-                        })}
-                    </div>
-                );
-            })}
+                                return (
+                                    <span
+                                        key={letterIndex}
+                                        className={`letter ${filledClass} ${flipClass}`}
+                                    >
+                                        {letter}
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 };

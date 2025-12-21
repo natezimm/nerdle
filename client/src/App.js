@@ -4,6 +4,7 @@ import WordGrid from './components/WordGrid';
 import Keyboard from './components/Keyboard';
 import StatsModal from './components/StatsModal';
 import SettingsModal from './components/SettingsModal';
+import Alert from './components/Alert';
 import { updateStats } from './utils/stats';
 import './App.css';
 
@@ -102,14 +103,14 @@ const App = () => {
                     setTimeout(() => {
                         const timeTaken = Date.now() - startTime;
                         updateStats(true, attempts.length + 1, timeTaken, wordLength);
-                        setMessage("Congratulations! You've guessed the word.");
+                        // setMessage("Congratulations! You've guessed the word."); // Suppressed for modal
                         setGameOver(true);
                         setIsStatsOpen(true);
                     }, flipDelay);
                 } else if (attempts.length + 1 >= maxAttempts) {
                     setTimeout(() => {
                         updateStats(false, maxAttempts, null, wordLength);
-                        setMessage(`Game over! The word was ${targetWord}.`);
+                        // setMessage(`Game over! The word was ${targetWord}.`); // Suppressed for modal
                         setGameOver(true);
                         setIsStatsOpen(true);
                     }, flipDelay);
@@ -166,8 +167,15 @@ const App = () => {
                 wordLength={wordLength}
                 onWordLengthChange={(len) => setWordLength(len)}
             />
-            <WordGrid attempts={attempts} currentGuess={currentGuess} targetWord={targetWord} wordLength={wordLength} />
-            <p>{message}</p>
+            <Alert
+                isOpen={!!message}
+                message={message}
+                onClose={() => setMessage("")}
+                duration={3000} /* Longer duration for readability */
+            />
+            <div className="game-content">
+                <WordGrid attempts={attempts} currentGuess={currentGuess} targetWord={targetWord} wordLength={wordLength} />
+            </div>
             <Keyboard onKeyPress={handleKeyPress} letterStatuses={letterStatuses} />        </div>
     );
 };
