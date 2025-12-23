@@ -35,7 +35,11 @@ const Keyboard = ({ onKeyPress, letterStatuses }) => {
                         {key.toUpperCase()}
                     </button>
                 ))}
-                <button onClick={() => onKeyPress("Backspace")} className="key key-wide key-backspace">
+                <button
+                    onClick={() => onKeyPress("Backspace")}
+                    className="key key-wide key-backspace"
+                    aria-label="Backspace"
+                >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         height="20"

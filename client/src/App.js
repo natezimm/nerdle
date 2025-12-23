@@ -144,7 +144,7 @@ const App = () => {
     }, [handleKeyPress]);
 
     return (
-        <div className="game-container">
+        <main className="game-container" aria-label="Nerdle game">
             <div className="header">
                 <h1>Nerdle</h1>
                 <button className="stats-button" onClick={() => setIsStatsOpen(true)} aria-label="Statistics">
@@ -176,7 +176,8 @@ const App = () => {
             <div className="game-content">
                 <WordGrid attempts={attempts} currentGuess={currentGuess} targetWord={targetWord} wordLength={wordLength} />
             </div>
-            <Keyboard onKeyPress={handleKeyPress} letterStatuses={letterStatuses} />        </div>
+            <Keyboard onKeyPress={handleKeyPress} letterStatuses={letterStatuses} />
+        </main>
     );
 };
 
