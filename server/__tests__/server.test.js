@@ -39,8 +39,11 @@ async function setupServerMocks() {
     get: (path, handler) => {
       getRoutes.push({ path, handler });
     },
-    post: (path, handler) => {
-      postRoutes.push({ path, handler });
+    post: (path, ...args) => {
+      // Handle both (path, handler) and (path, middleware, handler)
+      const handler = args[args.length - 1];
+      const middleware = args.length > 1 ? args.slice(0, -1) : [];
+      postRoutes.push({ path, handler, middleware });
     },
     listen: listenSpy,
   };
@@ -58,6 +61,12 @@ async function setupServerMocks() {
   }));
   await jest.unstable_mockModule('body-parser', () => ({
     default: { json: bodyParserJson },
+  }));
+  await jest.unstable_mockModule('helmet', () => ({
+    default: jest.fn(() => 'helmet-middleware'),
+  }));
+  await jest.unstable_mockModule('express-rate-limit', () => ({
+    default: jest.fn(() => 'rate-limit-middleware'),
   }));
 
   return {
@@ -117,7 +126,7 @@ describe('server configuration', () => {
     expect(deniedCallback).toHaveBeenCalled();
     expect(deniedCallback.mock.calls[0]?.[0]).toBeInstanceOf(Error);
     expect(bodyParserJson).toHaveBeenCalled();
-    expect(useCalls).toEqual(['cors-middleware', 'json-middleware']);
+    expect(useCalls).toEqual(['cors-middleware', 'helmet-middleware', 'rate-limit-middleware', 'json-middleware']);
 
     const healthRoute = getRoutes.find(route => route.path === '/api/health');
     expect(healthRoute).toBeDefined();
@@ -145,17 +154,19 @@ describe('server configuration', () => {
     expect(validateRoute).toBeDefined();
     const validateHandler = validateRoute?.handler;
     expect(validateHandler).toBeDefined();
-    const validRes = { json: jest.fn() };
+    const validRes = { json: jest.fn(), status: jest.fn().mockReturnThis() };
     validateHandler?.({ body: { word: 'apple' } }, validRes);
     expect(validRes.json).toHaveBeenCalledWith({ valid: true });
-    const validResFour = { json: jest.fn() };
+    const validResFour = { json: jest.fn(), status: jest.fn().mockReturnThis() };
     validateHandler?.({ body: { word: 'bash' } }, validResFour);
     expect(validResFour.json).toHaveBeenCalledWith({ valid: true });
-    const invalidRes = { json: jest.fn() };
+    const invalidRes = { json: jest.fn(), status: jest.fn().mockReturnThis() };
     validateHandler?.({ body: { word: 'zzzzz' } }, invalidRes);
     expect(invalidRes.json).toHaveBeenCalledWith({ valid: false });
-    const invalidResUnsupported = { json: jest.fn() };
+    const invalidResUnsupported = { json: jest.fn(), status: jest.fn().mockReturnThis() };
     validateHandler?.({ body: { word: 'ab' } }, invalidResUnsupported);
+    // 'ab' is now rejected by input validation (too short for game, but validation allows 1-10 chars)
+    // However the game only supports 4-6 letter words, so 'ab' returns { valid: false }
     expect(invalidResUnsupported.json).toHaveBeenCalledWith({ valid: false });
 
     expect(listenSpy).toHaveBeenCalledWith('5555', expect.any(Function));
@@ -202,7 +213,7 @@ describe('server configuration', () => {
     expect(listenSpy).not.toHaveBeenCalled();
     expect(corsMock).toHaveBeenCalled();
     expect(bodyParserJson).toHaveBeenCalled();
-    expect(useCalls).toEqual(['cors-middleware', 'json-middleware']);
+    expect(useCalls).toEqual(['cors-middleware', 'helmet-middleware', 'rate-limit-middleware', 'json-middleware']);
     expect(getRoutes).toHaveLength(2);
     expect(postRoutes).toHaveLength(1);
   });

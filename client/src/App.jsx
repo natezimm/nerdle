@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import WordGrid from './components/WordGrid';
-import Keyboard from './components/Keyboard';
-import StatsModal from './components/StatsModal';
-import SettingsModal from './components/SettingsModal';
-import Alert from './components/Alert';
+import WordGrid from './components/WordGrid.jsx';
+import Keyboard from './components/Keyboard.jsx';
+import StatsModal from './components/StatsModal.jsx';
+import SettingsModal from './components/SettingsModal.jsx';
+import Alert from './components/Alert.jsx';
 import { updateStats } from './utils/stats';
 import './App.css';
 

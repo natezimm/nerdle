@@ -15,7 +15,17 @@ router.get('/random', (req, res) => {
 
 // Route to validate a word against both techWords and word-list package
 router.post('/validate', (req, res) => {
-    const normalized = String(req.body?.word ?? '').toLowerCase();
+    const word = req.body?.word;
+
+    // Input validation: must be a string, max 10 chars, alphabetic only
+    if (typeof word !== 'string' || word.length === 0 || word.length > 10) {
+        return res.status(400).json({ error: 'Invalid word: must be 1-10 characters' });
+    }
+    if (!/^[a-zA-Z]+$/.test(word)) {
+        return res.status(400).json({ error: 'Invalid word: alphabetic characters only' });
+    }
+
+    const normalized = word.toLowerCase();
     const wordLength = normalized.length;
 
     const wordListsByLength = {

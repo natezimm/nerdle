@@ -1,10 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import StatsModal from './StatsModal';
+import { vi, describe, test, expect, beforeEach } from 'vitest';
+import StatsModal from './StatsModal.jsx';
 import { formatTime, getStats } from '../utils/stats';
 
-jest.mock('../utils/stats', () => ({
-    getStats: jest.fn(),
-    formatTime: jest.fn(),
+vi.mock('../utils/stats', () => ({
+    getStats: vi.fn(),
+    formatTime: vi.fn(),
 }));
 
 describe('StatsModal', () => {
@@ -14,7 +15,7 @@ describe('StatsModal', () => {
     });
 
     test('does not render when closed', () => {
-        render(<StatsModal isOpen={false} onClose={jest.fn()} />);
+        render(<StatsModal isOpen={false} onClose={vi.fn()} />);
         expect(screen.queryByText('Statistics')).not.toBeInTheDocument();
     });
 
@@ -28,7 +29,7 @@ describe('StatsModal', () => {
             fewestGuesses: 4,
         });
         formatTime.mockReturnValue('0:45');
-        const onClose = jest.fn();
+        const onClose = vi.fn();
         render(<StatsModal isOpen={true} onClose={onClose} />);
         expect(screen.getByText('Statistics')).toBeInTheDocument();
         const playedLabel = screen.getByText('Played');
@@ -53,7 +54,7 @@ describe('StatsModal', () => {
             fewestGuesses: null,
         });
         formatTime.mockReturnValue('--');
-        render(<StatsModal isOpen={true} onClose={jest.fn()} />);
+        render(<StatsModal isOpen={true} onClose={vi.fn()} />);
         expect(screen.getByText('0%')).toBeInTheDocument();
         const fastestLabel = screen.getByText('Fastest Time:');
         expect(fastestLabel.nextElementSibling).toHaveTextContent('--');

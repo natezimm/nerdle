@@ -1,19 +1,20 @@
 import { render } from '@testing-library/react';
 import { act } from 'react';
-import WordGrid from './WordGrid';
+import { vi, describe, test, expect, afterEach } from 'vitest';
+import WordGrid from './WordGrid.jsx';
 
 describe('WordGrid', () => {
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     test('renders persisted statuses for an attempt', () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
         const { container } = render(
             <WordGrid attempts={['plane']} currentGuess="" targetWord="apple" />
         );
         act(() => {
-            jest.advanceTimersByTime(2000);
+            vi.advanceTimersByTime(2000);
         });
         const letters = container.querySelectorAll('.word-row:first-child .letter');
         expect(letters).toHaveLength(5);
@@ -25,20 +26,20 @@ describe('WordGrid', () => {
     });
 
     test('shows flip classes while animating', () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
         const { container } = render(
             <WordGrid attempts={['plane']} currentGuess="" targetWord="apple" />
         );
         // advance only the first flip (300ms)
         act(() => {
-            jest.advanceTimersByTime(300);
+            vi.advanceTimersByTime(300);
         });
         const firstLetter = container.querySelector('.word-row:first-child .letter');
         expect(firstLetter).toHaveClass('flip');
         expect(firstLetter.className).toMatch(/-initial/);
         // finish remaining flips
         act(() => {
-            jest.advanceTimersByTime(2000);
+            vi.advanceTimersByTime(2000);
         });
         const letters = container.querySelectorAll('.word-row:first-child .letter');
         expect(letters[0]).toHaveClass('present-final');

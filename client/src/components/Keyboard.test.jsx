@@ -1,9 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import Keyboard from './Keyboard';
+import { vi, describe, test, expect } from 'vitest';
+import Keyboard from './Keyboard.jsx';
 
 describe('Keyboard', () => {
     test('passes letter statuses through class names and calls onKeyPress', async () => {
-        const onKeyPress = jest.fn();
+        const onKeyPress = vi.fn();
         render(<Keyboard onKeyPress={onKeyPress} letterStatuses={{ a: 'correct', b: 'present' }} />);
         const aButton = screen.getByRole('button', { name: 'A' });
         fireEvent.click(aButton);
@@ -16,7 +17,7 @@ describe('Keyboard', () => {
     });
 
     test('invokes onKeyPress for Enter and Backspace keys', async () => {
-        const onKeyPress = jest.fn();
+        const onKeyPress = vi.fn();
         const { container } = render(<Keyboard onKeyPress={onKeyPress} letterStatuses={{}} />);
         fireEvent.click(screen.getByRole('button', { name: 'Enter' }));
         expect(onKeyPress).toHaveBeenCalledWith('Enter');
@@ -26,7 +27,7 @@ describe('Keyboard', () => {
     });
 
     test('handles first row letters through onKeyPress', () => {
-        const onKeyPress = jest.fn();
+        const onKeyPress = vi.fn();
         render(<Keyboard onKeyPress={onKeyPress} letterStatuses={{}} />);
         fireEvent.click(screen.getByRole('button', { name: 'Q' }));
         expect(onKeyPress).toHaveBeenCalledWith('q');

@@ -2,6 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import techWords, { techWordsByLength } from './techWords.js';
 import { fourLetterWords, fiveLetterWords, sixLetterWords } from './utils.js';
 
@@ -42,7 +44,31 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(bodyParser.json());
+
+// Security headers
+app.use(helmet());
+
+// Rate limiting - 100 requests per 15 minutes per IP
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    message: { error: 'Too many requests, please try again later.' },
+});
+app.use(limiter);
+
+// Stricter rate limit for /validate to prevent brute-force word guessing
+const validateLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 20, // 20 requests per minute (enough for ~3 games)
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many validation requests, please slow down.' },
+});
+
+// Body parser with size limit to prevent large payload attacks
+app.use(bodyParser.json({ limit: '10kb' }));
 
 app.get('/api/health', (_req, res) => {
     res.status(200).json({ status: 'ok' });
@@ -56,8 +82,18 @@ app.get('/api/words/random', (req, res) => {
     res.json({ word: randomWord });
 });
 
-app.post('/api/words/validate', (req, res) => {
-    const normalized = String(req.body?.word ?? '').toLowerCase();
+app.post('/api/words/validate', validateLimiter, (req, res) => {
+    const word = req.body?.word;
+
+    // Input validation: must be a string, max 10 chars, alphabetic only
+    if (typeof word !== 'string' || word.length === 0 || word.length > 10) {
+        return res.status(400).json({ error: 'Invalid word: must be 1-10 characters' });
+    }
+    if (!/^[a-zA-Z]+$/.test(word)) {
+        return res.status(400).json({ error: 'Invalid word: alphabetic characters only' });
+    }
+
+    const normalized = word.toLowerCase();
     const wordLength = normalized.length;
 
     const wordListsByLength = {

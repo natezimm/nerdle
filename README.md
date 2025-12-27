@@ -17,8 +17,9 @@ Live: `https://nerdle.nathanzimmerman.com`
 
 ## Tech Stack
 
-- **Client**: React (CRA), Axios, Testing Library / Jest.
+- **Client**: React 18, Vite, Axios, Testing Library / Vitest.
 - **Server**: Node.js (ESM, Node 22), Express, `word-list`, Jest + Supertest.
+- **Security**: Helmet (security headers), express-rate-limit, input validation.
 - **Deploy**: GitHub Actions + AWS Lightsail (via SSH).
 
 ## Getting Started
@@ -54,9 +55,9 @@ cd ../server && npm ci
 2. **Client** (port `3000`)
    ```bash
    cd client
-   npm start
+   npm run dev
    ```
-   The React app runs on `http://localhost:3000` and proxies `/api` requests to `http://localhost:4000` (see `client/package.json`).
+   The React app runs on `http://localhost:3000` and proxies `/api` requests to `http://localhost:4000` (see `client/vite.config.js`).
 
 ### Environment Variables
 
@@ -67,13 +68,14 @@ cd ../server && npm ci
 
 ## Testing & Quality
 
-- **Client**
+- **Client** (Vitest)
   ```bash
   cd client
-  npm run test          # interactive mode
-  npm run test:coverage # single-run coverage report
+  npm test              # watch mode
+  npm test -- --run     # single run
+  npm run test:coverage # coverage report
   ```
-- **Server**
+- **Server** (Jest)
   ```bash
   cd server
   npm test

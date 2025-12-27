@@ -1,3 +1,4 @@
+import { describe, test, expect, beforeEach } from 'vitest';
 import { formatTime, getStats, updateStats } from './stats';
 
 describe('stats utility helpers', () => {

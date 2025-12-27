@@ -1,14 +1,18 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { act } from 'react';
+import { vi, describe, test, expect, beforeEach, afterEach } from 'vitest';
 import axios from 'axios';
 import { updateStats } from './utils/stats';
-import App from './App';
+import App from './App.jsx';
 
-jest.mock('axios');
-jest.mock('./utils/stats', () => ({
-    ...jest.requireActual('./utils/stats'),
-    updateStats: jest.fn(),
-}));
+vi.mock('axios');
+vi.mock('./utils/stats', async () => {
+    const actual = await vi.importActual('./utils/stats');
+    return {
+        ...actual,
+        updateStats: vi.fn(),
+    };
+});
 const parseKeys = (keys) => keys.match(/(\{[^}]+\}|.)/g) || [];
 const typeKeys = async (keys) => {
     for (const token of parseKeys(keys)) {
@@ -21,17 +25,17 @@ const typeKeys = async (keys) => {
 
 describe('App', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         localStorage.clear();
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     test('falls back to default API URL when env var is missing', async () => {
-        const previousApiUrl = process.env.REACT_APP_API_URL;
-        delete process.env.REACT_APP_API_URL;
+        const previousApiUrl = import.meta.env.VITE_API_URL;
+        delete import.meta.env.VITE_API_URL;
 
         axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
         render(<App />);
@@ -43,9 +47,9 @@ describe('App', () => {
         );
 
         if (previousApiUrl === undefined) {
-            delete process.env.REACT_APP_API_URL;
+            delete import.meta.env.VITE_API_URL;
         } else {
-            process.env.REACT_APP_API_URL = previousApiUrl;
+            import.meta.env.VITE_API_URL = previousApiUrl;
         }
     });
 
@@ -84,8 +88,8 @@ describe('App', () => {
     });
 
     test('opens stats, shows success message, and stops accepting input after winning', async () => {
-        jest.useFakeTimers();
-        const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(0);
+        vi.useFakeTimers();
+        const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(0);
         try {
             axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
             axios.post.mockResolvedValueOnce({ data: { valid: true } });
@@ -93,7 +97,7 @@ describe('App', () => {
             await typeKeys('apple{Enter}');
             await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(1));
             act(() => {
-                jest.advanceTimersByTime(2000);
+                vi.advanceTimersByTime(2000);
             });
             expect(await screen.findByText(/Congratulations!/i)).toBeInTheDocument();
             expect(screen.queryByText('Statistics')).not.toBeInTheDocument();
@@ -118,14 +122,14 @@ describe('App', () => {
     });
 
     test('updates keyboard letter statuses after a guess', async () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
         axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
         axios.post.mockResolvedValueOnce({ data: { valid: true } });
         render(<App />);
         await typeKeys('plane{Enter}');
         // updateLetterStatuses uses a 1500ms timeout
         act(() => {
-            jest.advanceTimersByTime(1500);
+            vi.advanceTimersByTime(1500);
         });
         // P, L, A should be present; E should be correct
         const pKey = screen.getByRole('button', { name: 'P' });
@@ -139,13 +143,13 @@ describe('App', () => {
     });
 
     test('handles repeated letters and updates statuses correctly', async () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
         axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
         axios.post.mockResolvedValueOnce({ data: { valid: true } });
         render(<App />);
         await typeKeys('allee{Enter}');
         act(() => {
-            jest.advanceTimersByTime(1500);
+            vi.advanceTimersByTime(1500);
         });
         const aKey = screen.getByRole('button', { name: 'A' });
         const lKey = screen.getByRole('button', { name: 'L' });
@@ -156,7 +160,7 @@ describe('App', () => {
     });
 
     test("doesn't downgrade 'correct' statuses on later guesses", async () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
         axios.get.mockResolvedValue({ data: { word: 'apple' } });
         // Make all validation calls succeed
         axios.post.mockResolvedValue({ data: { valid: true } });
@@ -165,7 +169,7 @@ describe('App', () => {
         // First guess: 'a----' to set 'a' as correct
         await typeKeys('axxxx{Enter}');
         act(() => {
-            jest.advanceTimersByTime(1500);
+            vi.advanceTimersByTime(1500);
         });
         const aKey = screen.getByRole('button', { name: 'A' });
         expect(aKey).toHaveClass('correct');
@@ -173,13 +177,13 @@ describe('App', () => {
         // Second guess places 'a' in a non-matching position; it should NOT downgrade 'correct'
         await typeKeys('baaaa{Enter}');
         act(() => {
-            jest.advanceTimersByTime(1500);
+            vi.advanceTimersByTime(1500);
         });
         expect(aKey).toHaveClass('correct');
     });
 
     test('clears prior messages after a non-final valid guess', async () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
         axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
         axios.post.mockResolvedValue({ data: { valid: true } });
         render(<App />);
@@ -192,7 +196,7 @@ describe('App', () => {
         await typeKeys('plane{Enter}');
         // advance timers by flipDelay (300 * 5 = 1500ms)
         act(() => {
-            jest.advanceTimersByTime(1500);
+            vi.advanceTimersByTime(1500);
         });
 
         await waitFor(() => expect(screen.queryByText(/Guess must be 5 letters/i)).not.toBeInTheDocument());
@@ -218,8 +222,8 @@ describe('App', () => {
     });
 
     test('calls updateStats with win=true when guessing the word', async () => {
-        jest.useFakeTimers();
-        const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(0);
+        vi.useFakeTimers();
+        const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(0);
         try {
             axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
             axios.post.mockResolvedValueOnce({ data: { valid: true } });
@@ -227,7 +231,7 @@ describe('App', () => {
             await typeKeys('apple{Enter}');
             await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(1));
             act(() => {
-                jest.advanceTimersByTime(2000);
+                vi.advanceTimersByTime(2000);
             });
             expect(updateStats).toHaveBeenCalledWith(true, 1, 0, 5);
         } finally {
@@ -236,7 +240,7 @@ describe('App', () => {
     });
 
     test('calls updateStats with win=false after max attempts (loss)', async () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
         axios.get.mockResolvedValue({ data: { word: 'apple' } });
         axios.post.mockResolvedValue({ data: { valid: true } });
         render(<App />);
@@ -246,7 +250,7 @@ describe('App', () => {
             await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(i + 1));
         }
         act(() => {
-            jest.advanceTimersByTime(2000);
+            vi.advanceTimersByTime(2000);
         });
         expect(updateStats).toHaveBeenCalledWith(false, 6, null, 5);
         expect(screen.getByText(/Game over! The word was apple\./i)).toBeInTheDocument();
