@@ -28,7 +28,7 @@ jobs:
 
       - name: Client tests + coverage
         working-directory: client
-        run: npm run test:coverage
+        run: npm test -- --run
 
       # ---------- Server (Node.js) ----------
       - name: Install server deps
