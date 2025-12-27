@@ -19,8 +19,21 @@ Live: `https://nerdle.nathanzimmerman.com`
 
 - **Client**: React 18, Vite, Axios, Testing Library / Vitest.
 - **Server**: Node.js (ESM, Node 22), Express, `word-list`, Jest + Supertest.
-- **Security**: Helmet (security headers), express-rate-limit, input validation.
 - **Deploy**: GitHub Actions + AWS Lightsail (via SSH).
+
+## Security
+
+The server implements multiple layers of security:
+
+- **Helmet**: Sets secure HTTP headers (XSS protection, content security policy, etc.)
+- **CORS**: Strict origin allowlist; only trusted domains and localhost (in dev) are permitted.
+- **Rate Limiting**:
+  - Global: 100 requests per 15 minutes per IP.
+  - `/api/words/validate`: 20 requests per minute to prevent brute-force guessing.
+- **Input Validation**: The `/validate` endpoint enforces:
+  - Alphabetic characters only (`a-zA-Z`).
+  - Length between 1–10 characters.
+- **Body Size Limit**: JSON payloads capped at 10KB to prevent large payload attacks.
 
 ## Getting Started
 
