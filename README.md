@@ -22,9 +22,6 @@ Live: `https://nerdle.nathanzimmerman.com`
 - **Deploy**: GitHub Actions + AWS Lightsail (via SSH).
 
 ## Security
-
-The server implements multiple layers of security:
-
 - **Helmet**: Sets secure HTTP headers (XSS protection, content security policy, etc.)
 - **CORS**: Strict origin allowlist; only trusted domains and localhost (in dev) are permitted.
 - **Rate Limiting**:
