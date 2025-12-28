@@ -105,14 +105,12 @@ const App = () => {
                         updateStats(true, attempts.length + 1, timeTaken, wordLength);
                         setMessage("Congratulations! You've guessed the word.");
                         setGameOver(true);
-                        // setIsStatsOpen(true);
                     }, flipDelay);
                 } else if (attempts.length + 1 >= maxAttempts) {
                     setTimeout(() => {
                         updateStats(false, maxAttempts, null, wordLength);
                         setMessage(`Game over! The word was ${targetWord}.`);
                         setGameOver(true);
-                        // setIsStatsOpen(true);
                     }, flipDelay);
                 } else {
                     setTimeout(() => {
@@ -133,7 +131,7 @@ const App = () => {
         } else if (key === "Backspace") {
             setCurrentGuess((prev) => prev.slice(0, -1));
         } else if (/^[a-zA-Z]$/.test(key) && currentGuess.length < wordLength) {
-            setCurrentGuess((prev) => prev + key.toLowerCase()); // Add the key to the current guess
+            setCurrentGuess((prev) => prev + key.toLowerCase());
         }
     }, [submitGuess, currentGuess, gameOver, wordLength]);
 
@@ -171,7 +169,7 @@ const App = () => {
                 isOpen={!!message}
                 message={message}
                 onClose={() => setMessage("")}
-                duration={3000} /* Longer duration for readability */
+                duration={3000}
             />
             <div className="game-content">
                 <WordGrid attempts={attempts} currentGuess={currentGuess} targetWord={targetWord} wordLength={wordLength} />

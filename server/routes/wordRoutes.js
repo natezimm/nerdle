@@ -4,7 +4,6 @@ import { fourLetterWords, fiveLetterWords, sixLetterWords } from '../utils.js';
 
 const router = express.Router();
 
-// Route to get a random tech word
 router.get('/random', (req, res) => {
     const requestedLength = Number(req.query?.length);
     const wordLength = [4, 5, 6].includes(requestedLength) ? requestedLength : 5;
@@ -13,11 +12,9 @@ router.get('/random', (req, res) => {
     res.json({ word: randomWord });
 });
 
-// Route to validate a word against both techWords and word-list package
 router.post('/validate', (req, res) => {
     const word = req.body?.word;
 
-    // Input validation: must be a string, max 10 chars, alphabetic only
     if (typeof word !== 'string' || word.length === 0 || word.length > 10) {
         return res.status(400).json({ error: 'Invalid word: must be 1-10 characters' });
     }

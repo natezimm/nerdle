@@ -1,6 +1,5 @@
 import { jest } from '@jest/globals';
 
-// Mock five-letter words
 await jest.unstable_mockModule('../utils.js', () => ({
   fourLetterWords: ['bash', 'json', 'http'],
   fiveLetterWords: ['apple', 'hello', 'world'],
@@ -72,31 +71,26 @@ test('POST /api/words/validate rejects invalid input', async () => {
   const handler = getRouteHandler('post', '/validate');
   expect(handler).toBeDefined();
 
-  // Empty word
   const res1 = createRes();
   handler?.({ body: { word: '' } }, res1);
   expect(res1.status).toHaveBeenCalledWith(400);
   expect(res1.json).toHaveBeenCalledWith({ error: 'Invalid word: must be 1-10 characters' });
 
-  // Word too long (> 10 chars)
   const res2 = createRes();
   handler?.({ body: { word: 'abcdefghijk' } }, res2);
   expect(res2.status).toHaveBeenCalledWith(400);
   expect(res2.json).toHaveBeenCalledWith({ error: 'Invalid word: must be 1-10 characters' });
 
-  // Non-alphabetic characters
   const res3 = createRes();
   handler?.({ body: { word: 'test123' } }, res3);
   expect(res3.status).toHaveBeenCalledWith(400);
   expect(res3.json).toHaveBeenCalledWith({ error: 'Invalid word: alphabetic characters only' });
 
-  // Non-string input
   const res4 = createRes();
   handler?.({ body: { word: 12345 } }, res4);
   expect(res4.status).toHaveBeenCalledWith(400);
   expect(res4.json).toHaveBeenCalledWith({ error: 'Invalid word: must be 1-10 characters' });
 
-  // Missing word
   const res5 = createRes();
   handler?.({ body: {} }, res5);
   expect(res5.status).toHaveBeenCalledWith(400);

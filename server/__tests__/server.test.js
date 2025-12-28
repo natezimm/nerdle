@@ -40,7 +40,6 @@ async function setupServerMocks() {
       getRoutes.push({ path, handler });
     },
     post: (path, ...args) => {
-      // Handle both (path, handler) and (path, middleware, handler)
       const handler = args[args.length - 1];
       const middleware = args.length > 1 ? args.slice(0, -1) : [];
       postRoutes.push({ path, handler, middleware });
@@ -165,8 +164,6 @@ describe('server configuration', () => {
     expect(invalidRes.json).toHaveBeenCalledWith({ valid: false });
     const invalidResUnsupported = { json: jest.fn(), status: jest.fn().mockReturnThis() };
     validateHandler?.({ body: { word: 'ab' } }, invalidResUnsupported);
-    // 'ab' is now rejected by input validation (too short for game, but validation allows 1-10 chars)
-    // However the game only supports 4-6 letter words, so 'ab' returns { valid: false }
     expect(invalidResUnsupported.json).toHaveBeenCalledWith({ valid: false });
 
     expect(listenSpy).toHaveBeenCalledWith('5555', expect.any(Function));
