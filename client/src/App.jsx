@@ -175,6 +175,9 @@ const App = () => {
                 <WordGrid attempts={attempts} currentGuess={currentGuess} targetWord={targetWord} wordLength={wordLength} />
             </div>
             <Keyboard onKeyPress={handleKeyPress} letterStatuses={letterStatuses} />
+            <footer className="site-footer">
+                Made by <a href="https://nathanzimmerman.com" target="_blank" rel="noopener noreferrer">Nathan Zimmerman</a>
+            </footer>
         </main>
     );
 };

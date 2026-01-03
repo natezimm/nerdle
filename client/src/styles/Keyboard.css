@@ -1,7 +1,7 @@
 .keyboard {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
     max-width: 500px;
     /* Prevent being too wide on desktop */
@@ -23,8 +23,8 @@
 .key {
     flex: 1;
     /* Grow to fill space */
-    height: 58px;
-    font-size: 1.25rem;
+    height: 52px;
+    font-size: 1.15rem;
     font-weight: bold;
     text-transform: uppercase;
     border: none;

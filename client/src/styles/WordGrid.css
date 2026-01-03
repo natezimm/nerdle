@@ -8,13 +8,13 @@
 
 .letter {
     width: auto;
-    max-width: 60px;
+    max-width: 54px;
     aspect-ratio: 1 / 1;
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2rem;
+    font-size: 1.85rem;
     font-weight: bold;
     border: 2px solid var(--tile-border-empty);
     text-transform: uppercase;

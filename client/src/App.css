@@ -88,3 +88,20 @@
   height: 24px;
   margin: 0;
 }
+
+.site-footer {
+  font-size: 12px;
+  color: var(--color-text-secondary, #6e6e6e);
+  padding: 8px 0;
+  flex-shrink: 0;
+}
+
+.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.site-footer a:hover {
+  color: var(--color-text);
+}

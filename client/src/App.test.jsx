@@ -255,4 +255,19 @@ describe('App', () => {
         expect(updateStats).toHaveBeenCalledWith(false, 6, null, 5);
         expect(screen.getByText(/Game over! The word was apple\./i)).toBeInTheDocument();
     });
+
+    test('renders footer with attribution link to nathanzimmerman.com', async () => {
+        axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
+        render(<App />);
+        
+        const footer = document.querySelector('.site-footer');
+        expect(footer).toBeInTheDocument();
+        expect(footer).toHaveTextContent('Made by Nathan Zimmerman');
+        
+        const link = footer.querySelector('a');
+        expect(link).toHaveAttribute('href', 'https://nathanzimmerman.com');
+        expect(link).toHaveAttribute('target', '_blank');
+        expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+        expect(link).toHaveTextContent('Nathan Zimmerman');
+    });
 });
