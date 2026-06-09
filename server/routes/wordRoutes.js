@@ -1,40 +1,36 @@
 import express from 'express';
-import techWords, { techWordsByLength } from '../techWords.js';
-import { fourLetterWords, fiveLetterWords, sixLetterWords } from '../utils.js';
+import {
+  getRandomTechWord,
+  isValidGuess,
+  normalizeGuess,
+} from '../services/wordService.js';
 
-const router = express.Router();
+/**
+ * @param {{ validateLimiter?: import('express').RequestHandler }} [options]
+ */
+const createWordRouter = ({ validateLimiter } = {}) => {
+  const router = express.Router();
 
-router.get('/random', (req, res) => {
-    const requestedLength = Number(req.query?.length);
-    const wordLength = [4, 5, 6].includes(requestedLength) ? requestedLength : 5;
-    const wordPool = techWordsByLength[wordLength] ?? techWords;
-    const randomWord = wordPool[Math.floor(Math.random() * wordPool.length)];
-    res.json({ word: randomWord });
-});
+  router.get('/random', (req, res) => {
+    res.json({ word: getRandomTechWord(req.query?.length) });
+  });
 
-router.post('/validate', (req, res) => {
-    const word = req.body?.word;
+  const validateHandlers = [];
+  if (validateLimiter) {
+    validateHandlers.push(validateLimiter);
+  }
 
-    if (typeof word !== 'string' || word.length === 0 || word.length > 10) {
-        return res.status(400).json({ error: 'Invalid word: must be 1-10 characters' });
+  router.post('/validate', ...validateHandlers, (req, res) => {
+    const normalized = normalizeGuess(req.body?.word);
+
+    if (!normalized.ok) {
+      return res.status(400).json({ error: normalized.error });
     }
-    if (!/^[a-zA-Z]+$/.test(word)) {
-        return res.status(400).json({ error: 'Invalid word: alphabetic characters only' });
-    }
 
-    const normalized = word.toLowerCase();
-    const wordLength = normalized.length;
+    res.json({ valid: isValidGuess(normalized.word) });
+  });
 
-    const wordListsByLength = {
-        4: fourLetterWords,
-        5: fiveLetterWords,
-        6: sixLetterWords,
-    };
+  return router;
+};
 
-    const dictionaryWords = wordListsByLength[wordLength] ?? [];
-    const techWordPool = techWordsByLength[wordLength] ?? [];
-    const isValid = dictionaryWords.includes(normalized) || techWordPool.includes(normalized);
-    res.json({ valid: isValid });
-});
-
-export default router;
+export default createWordRouter;

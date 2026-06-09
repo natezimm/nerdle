@@ -1,5 +1,6 @@
 export const __invokeWebVitals = async (onPerfEntry) => {
-  const { getCLS, getFID, getFCP, getLCP, getTTFB } = await import('web-vitals');
+  const { getCLS, getFID, getFCP, getLCP, getTTFB } =
+    await import('web-vitals');
   getCLS(onPerfEntry);
   getFID(onPerfEntry);
   getFCP(onPerfEntry);
@@ -7,10 +8,12 @@ export const __invokeWebVitals = async (onPerfEntry) => {
   getTTFB(onPerfEntry);
 };
 
-const reportWebVitals = onPerfEntry => {
-  if (onPerfEntry && onPerfEntry instanceof Function) {
-    __invokeWebVitals(onPerfEntry);
+const reportWebVitals = (onPerfEntry) => {
+  if (typeof onPerfEntry === 'function') {
+    return __invokeWebVitals(onPerfEntry);
   }
+
+  return Promise.resolve();
 };
 
 export default reportWebVitals;

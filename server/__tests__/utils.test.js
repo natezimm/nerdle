@@ -1,6 +1,5 @@
 import { jest } from '@jest/globals';
 
-
 const mockData = `apple
 baker
 candy
@@ -23,7 +22,7 @@ test('utils loads five-letter words from file', () => {
   expect(fiveLetterWords).toContain('apple');
   expect(fiveLetterWords).toContain('baker');
   expect(fiveLetterWords).toContain('hello');
-  expect(fiveLetterWords.every(w => w.length === 5)).toBe(true);
+  expect(fiveLetterWords.every((w) => w.length === 5)).toBe(true);
 });
 
 test('utils returns empty array when readFile throws during tests', async () => {
@@ -63,7 +62,10 @@ test('utils logs an error and returns empty array outside of test env', async ()
     const { default: fiveLetterWordsErr } = await import('../utils.js');
     expect(Array.isArray(fiveLetterWordsErr)).toBe(true);
     expect(fiveLetterWordsErr).toHaveLength(0);
-    expect(consoleSpy).toHaveBeenCalledWith('Error reading words.txt file:', failingError);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Error reading words.txt file:',
+      failingError
+    );
   } finally {
     consoleSpy.mockRestore();
     process.env.NODE_ENV = previousEnv;

@@ -19,9 +19,13 @@ Live: `https://nerdle.nathanzimmerman.com`
 
 - **Client**: React 18, Vite, Axios, Testing Library / Vitest.
 - **Server**: Node.js (ESM, Node 22), Express, `word-list`, Jest + Supertest.
+- **Quality**: ESLint, Prettier, TypeScript `checkJs`, coverage thresholds.
 - **Deploy**: GitHub Actions + AWS Lightsail (via SSH).
 
+See [`docs/architecture.md`](docs/architecture.md) for state flow, server boundaries, security tradeoffs, and deployment notes.
+
 ## Security
+
 - **Helmet**: Sets secure HTTP headers (XSS protection, content security policy, etc.)
 - **CORS**: Strict origin allowlist; only trusted domains and localhost (in dev) are permitted.
 - **Rate Limiting**:
@@ -31,6 +35,7 @@ Live: `https://nerdle.nathanzimmerman.com`
   - Alphabetic characters only (`a-zA-Z`).
   - Length between 1–10 characters.
 - **Body Size Limit**: JSON payloads capped at 10KB to prevent large payload attacks.
+- **Gameplay Tradeoff**: The target word is sent to the browser for this casual game. This is documented in `docs/architecture.md`; a cheat-resistant version would keep answers server-side.
 
 ## Getting Started
 
@@ -46,9 +51,10 @@ git clone https://github.com/natezimm/nerdle.git
 cd nerdle
 ```
 
-Install dependencies for each app:
+Install root quality tooling and app dependencies:
 
 ```bash
+npm ci
 cd client && npm ci
 cd ../server && npm ci
 ```
@@ -56,10 +62,12 @@ cd ../server && npm ci
 ### Running Locally
 
 1. **Server** (port `4000`)
+
    ```bash
    cd server
    npm start
    ```
+
    The server listens on `http://localhost:4000` by default and exposes the API used by the client.
 
 2. **Client** (port `3000`)
@@ -71,28 +79,50 @@ cd ../server && npm ci
 
 ### Environment Variables
 
+- Copy examples when local overrides are needed:
+
+  ```bash
+  cp client/.env.example client/.env
+  cp server/.env.example server/.env
+  ```
+
 - **Server**
   - `PORT` (default: `4000`)
   - `CORS_ORIGIN` – additional allowed origin for browsers (optional)
   - `NODE_ENV` – set to `production` in production
+- **Client**
+  - `VITE_API_URL` is optional. Local development normally uses the Vite `/api` proxy.
 
 ## Testing & Quality
 
+- **Root quality gates**
+
+  ```bash
+  npm run lint
+  npm run typecheck
+  npm run format:check
+  npm run quality
+  ```
+
 - **Client** (Vitest)
+
   ```bash
   cd client
   npm test              # watch mode
   npm test -- --run     # single run
   npm run test:coverage # coverage report
   ```
+
 - **Server** (Jest)
+
   ```bash
   cd server
   npm test
   ```
+
   Jest covers the API routes, tech word list, and word list loader (ESM tests run with `--experimental-vm-modules`).
 
-- CI runs client and server test suites on every push to `main`
+- CI runs lint, typecheck, client/server tests, and the client production build on pull requests and pushes to `main`
 - Code coverage is checked and enforced before deployment
 - Coverage thresholds:
   - Lines ≥ 90%
@@ -103,10 +133,12 @@ cd ../server && npm ci
 ## Build & Deploy
 
 - **Client production build**
+
   ```bash
   cd client
   npm run build
   ```
+
   The build output lands in `client/build`.
 
 - **Deploy (Lightsail)**

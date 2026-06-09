@@ -1,86 +1,84 @@
 .word-row {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 5px;
-    gap: 5px;
-    flex-shrink: 1;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5px;
+  gap: 5px;
+  flex-shrink: 1;
 }
 
 .letter {
-    width: auto;
-    max-width: 54px;
-    aspect-ratio: 1 / 1;
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.85rem;
-    font-weight: bold;
-    border: 2px solid var(--tile-border-empty);
-    text-transform: uppercase;
-    color: var(--tile-text);
-    transition: background-color 0.3s ease;
+  width: auto;
+  max-width: 54px;
+  aspect-ratio: 1 / 1;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.85rem;
+  font-weight: bold;
+  border: 2px solid var(--tile-border-empty);
+  text-transform: uppercase;
+  color: var(--tile-text);
+  transition: background-color 0.3s ease;
 }
 
 @media (max-width: 350px) {
-    .letter {
-        font-size: 1.5rem;
-    }
+  .letter {
+    font-size: 1.5rem;
+  }
 }
 
-
-
 .letter-empty {
-    border-color: var(--tile-border-empty);
+  border-color: var(--tile-border-empty);
 }
 
 .letter-filled {
-    border-color: var(--tile-border-filled);
+  border-color: var(--tile-border-filled);
 }
 
 .correct-initial,
 .present-initial,
 .absent-initial {
-    background-color: var(--tile-reveal-bg);
+  background-color: var(--tile-reveal-bg);
 }
 
 .correct-final {
-    background-color: #6aaa64;
-    border: 2px solid #6aaa64;
-    color: #fff;
+  background-color: #6aaa64;
+  border: 2px solid #6aaa64;
+  color: #fff;
 }
 
 .present-final {
-    background-color: #c9b458;
-    border: 2px solid #c9b458;
-    color: #fff;
+  background-color: #c9b458;
+  border: 2px solid #c9b458;
+  color: #fff;
 }
 
 .absent-final {
-    background-color: var(--status-absent-bg);
-    border: 2px solid var(--status-absent-bg);
-    color: #fff;
+  background-color: var(--status-absent-bg);
+  border: 2px solid var(--status-absent-bg);
+  color: #fff;
 }
 
 @keyframes flip {
-    0% {
-        transform: scaleY(1);
-    }
+  0% {
+    transform: scaleY(1);
+  }
 
-    50% {
-        transform: scaleY(0);
-        background-color: transparent;
-    }
+  50% {
+    transform: scaleY(0);
+    background-color: transparent;
+  }
 
-    51% {
-        background-color: inherit;
-    }
+  51% {
+    background-color: inherit;
+  }
 
-    100% {
-        transform: scaleY(1);
-    }
+  100% {
+    transform: scaleY(1);
+  }
 }
 
 .flip {
-    animation: flip 500ms ease forwards;
+  animation: flip 500ms ease forwards;
 }

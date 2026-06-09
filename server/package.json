@@ -6,7 +6,7 @@
   },
   "main": "server.js",
   "scripts": {
-    "build": "cd client && npm run build",
+    "build": "npm run build --prefix ../client",
     "start": "node server.js",
     "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --coverage --watchAll=false"
   },
@@ -15,7 +15,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",

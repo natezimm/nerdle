@@ -1,85 +1,85 @@
 .keyboard {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    width: 100%;
-    max-width: 500px;
-    /* Prevent being too wide on desktop */
-    padding: 0 8px;
-    /* Safe padding for edges */
-    box-sizing: border-box;
-    margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 500px;
+  /* Prevent being too wide on desktop */
+  padding: 0 8px;
+  /* Safe padding for edges */
+  box-sizing: border-box;
+  margin-bottom: 5px;
 }
 
 .keyboard-row {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    /* Restored larger gap */
-    width: 100%;
-    margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  /* Restored larger gap */
+  width: 100%;
+  margin: 0 auto;
 }
 
 .key {
-    flex: 1;
-    /* Grow to fill space */
-    height: 52px;
-    font-size: 1.15rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    border: none;
-    background-color: var(--key-bg);
-    color: var(--key-text);
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 0;
-    /* Allow shrinking below content size if needed */
-    padding: 0;
+  flex: 1;
+  /* Grow to fill space */
+  height: 52px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: none;
+  background-color: var(--key-bg);
+  color: var(--key-text);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  /* Allow shrinking below content size if needed */
+  padding: 0;
 }
 
 .key-wide {
-    flex: 1.5;
-    /* Enter/Backspace should be larger */
-    font-size: 0.75rem;
+  flex: 1.5;
+  /* Enter/Backspace should be larger */
+  font-size: 0.75rem;
 }
 
 .half-spacer {
-    flex: 0.5;
+  flex: 0.5;
 }
 
 .key.correct {
-    background-color: #6aaa64;
-    color: white;
+  background-color: #6aaa64;
+  color: white;
 }
 
 .key.present {
-    background-color: #c9b458;
-    color: white;
+  background-color: #c9b458;
+  color: white;
 }
 
 .key.absent {
-    background-color: var(--status-absent-bg);
-    color: white;
+  background-color: var(--status-absent-bg);
+  color: white;
 }
 
 .backspace-icon {
-    fill: var(--backspace-fill);
+  fill: var(--backspace-fill);
 }
 
 @media (max-width: 600px) {
-    .key {
-        font-size: 1rem;
-    }
+  .key {
+    font-size: 1rem;
+  }
 
-    .key-wide {
-        font-size: 0.75rem;
-    }
+  .key-wide {
+    font-size: 0.75rem;
+  }
 
-    .keyboard-row {
-        gap: 4px;
-        /* Slightly tighter on mobile but still distinct */
-    }
+  .keyboard-row {
+    gap: 4px;
+    /* Slightly tighter on mobile but still distinct */
+  }
 }

@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noImplicitAny": false,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "target": "ES2022",
+    "types": ["node", "react", "react-dom"]
+  },
+  "include": [
+    "client/src/**/*.js",
+    "client/src/**/*.jsx",
+    "client/src/**/*.d.ts",
+    "server/**/*.js"
+  ],
+  "exclude": [
+    "**/*.test.js",
+    "**/*.test.jsx",
+    "client/src/setupTests.js",
+    "client/coverage",
+    "server/__tests__",
+    "server/coverage",
+    "node_modules"
+  ]
+}
