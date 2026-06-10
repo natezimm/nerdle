@@ -22,7 +22,7 @@ Live: `https://nerdle.nathanzimmerman.com`
 - **Quality**: ESLint, Prettier, TypeScript `checkJs`, coverage thresholds.
 - **Deploy**: GitHub Actions + AWS Lightsail (via SSH).
 
-See [`docs/architecture.md`](docs/architecture.md) for state flow, server boundaries, security tradeoffs, and deployment notes.
+See [`docs/architecture.md`](docs/architecture.md) for runtime boundaries, quality gates, deployment flow, and deferred architecture follow-ups.
 
 ## Security
 

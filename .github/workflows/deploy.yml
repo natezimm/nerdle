@@ -17,47 +17,26 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: |
             package-lock.json
             client/package-lock.json
             server/package-lock.json
 
-      # ---------- Root quality tooling ----------
-      - name: Install root deps
+      - name: Install root quality dependencies
         run: npm ci
 
-      # ---------- Client (React) ----------
-      - name: Install client deps
+      - name: Install client dependencies
         working-directory: client
         run: npm ci
 
-      # ---------- Server (Node.js) ----------
-      - name: Install server deps
+      - name: Install server dependencies
         working-directory: server
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
-
-      - name: Format check
-        run: npm run format:check
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Client tests + coverage
-        working-directory: client
-        run: npm test -- --run
-
-      - name: Server tests + coverage
-        working-directory: server
-        run: npm test
-
-      - name: Client production build
-        working-directory: client
-        run: npm run build
+      - name: Run quality gate
+        run: npm run quality
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -94,19 +73,19 @@ jobs:
 
       - name: Health check (client + server)
         run: |
-          echo "⏳ Waiting for services to start..."
+          echo "Waiting for services to start..."
           sleep 8
 
-          echo "🔍 Checking client..."
+          echo "Checking client..."
           curl -f https://${{ secrets.APP_DOMAIN }} || {
-            echo "❌ Client health check failed"
+            echo "Client health check failed"
             exit 1
           }
 
-          echo "🔍 Checking server..."
+          echo "Checking server..."
           curl -f https://${{ secrets.APP_DOMAIN }}/api/health || {
-            echo "❌ Server health check failed"
+            echo "Server health check failed"
             exit 1
           }
 
-          echo "✅ Deploy health check passed"
+          echo "Deploy health check passed"
