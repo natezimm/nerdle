@@ -60,6 +60,18 @@ export default [
     },
   },
   {
+    files: ['playwright.config.mjs', 'e2e/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.es2022,
+      },
+    },
+  },
+  {
     files: ['client/src/**/*.test.{js,jsx}', 'server/__tests__/**/*.js'],
     languageOptions: {
       globals: {

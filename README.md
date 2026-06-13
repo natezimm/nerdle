@@ -101,6 +101,7 @@ cd ../server && npm ci
   npm run lint
   npm run typecheck
   npm run format:check
+  npm run test:e2e
   npm run quality
   ```
 
@@ -122,7 +123,8 @@ cd ../server && npm ci
 
   Jest covers the API routes, tech word list, and word list loader (ESM tests run with `--experimental-vm-modules`).
 
-- CI runs lint, typecheck, client/server tests, and the client production build on pull requests and pushes to `main`
+- CI runs lint, typecheck, client/server tests, Playwright smoke tests, and the client production build on pull requests and pushes to `main`
+- Playwright covers the built client across desktop and mobile Chromium viewports with API responses mocked at the browser boundary
 - Code coverage is checked and enforced before deployment
 - Coverage thresholds:
   - Lines ≥ 90%
