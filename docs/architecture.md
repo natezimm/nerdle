@@ -9,15 +9,17 @@ Nerdle is a two-package Node application with a Vite/React client in `client/` a
 ```mermaid
 flowchart LR
   Visitor["Player browser"] --> Client["React 18 + Vite client<br/>client/"]
-  Client --> GameState["useNerdleGame<br/>gameplay state + scoring"]
+  Client --> GameState["useNerdleGame<br/>gameplay state"]
   Client --> UI["Grid, keyboard, modals<br/>client/src/components"]
   Client --> Stats["Browser stats<br/>localStorage"]
-  Client --> ApiClient["Word API client<br/>client/src/api/words.js"]
+  Client --> ApiClient["Game API client<br/>client/src/api/games.js"]
   ApiClient --> Express["Express API<br/>server/"]
-  Express --> Random["GET /api/words/random"]
-  Express --> Validate["POST /api/words/validate"]
-  Random --> Words["Curated tech words"]
-  Validate --> Dictionary["Tech words + word-list dictionary"]
+  Express --> Start["POST /api/games"]
+  Express --> Guess["POST /api/games/:id/guesses"]
+  Start --> Games["Bounded, expiring game store"]
+  Games --> Words["Curated tech words"]
+  Guess --> Games
+  Guess --> Dictionary["Tech words + word-list dictionary"]
   Express --> Middleware["Helmet, CORS,<br/>rate limits, validation"]
   Repo["Repo quality gate<br/>npm run quality"] --> Build["Client build<br/>client/build"]
   Build --> Deploy["GitHub Actions<br/>deploy-nerdle.sh"]
@@ -32,14 +34,14 @@ flowchart LR
   classDef external fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
   class Visitor user
   class Client,GameState,UI,ApiClient client
-  class Express,Random,Validate,Middleware server
-  class Stats,Words,Dictionary data
+  class Express,Start,Guess,Middleware server
+  class Stats,Games,Words,Dictionary data
   class Repo,Build,Deploy delivery
 ```
 
 ## Source Boundaries
 
-The client owns gameplay state, rendering, keyboard interaction, modals, local statistics, and API calls. The server owns word selection, guess validation, security middleware, CORS, rate limits, and health checks. Shared quality tooling lives at the repo root.
+The client owns rendering, keyboard interaction, animations, modals, local statistics, and API calls. The server owns target words, per-game state, guess validation and scoring, security middleware, CORS, rate limits, and health checks. The client receives only an opaque game ID when play starts and receives the answer only after a terminal result. Shared quality tooling lives at the repo root.
 
 ## Quality Gates
 
@@ -97,6 +99,6 @@ flowchart LR
   class Actions,Lightsail delivery
 ```
 
-## Deferred Architecture Follow-Ups
+## Game State
 
-The browser currently receives the target word for a casual-game tradeoff. A cheat-resistant version should keep the answer server-side and introduce a per-game server session or signed game token.
+Games are held in bounded, expiring process memory because the current deployment runs one API instance. An API restart invalidates games in progress. If the service is scaled to multiple processes or hosts, move the game store to Redis or a database with the same expiry policy.

@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import createWordRouter from './routes/wordRoutes.js';
+import createGameRouter from './routes/gameRoutes.js';
 
 const DEFAULT_ALLOWED_ORIGINS = [
   'http://localhost:3000',
@@ -56,12 +56,12 @@ export const createApp = (env = process.env) => {
     })
   );
 
-  const validateLimiter = rateLimit({
+  const guessLimiter = rateLimit({
     windowMs: 60 * 1000,
     max: 20,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: 'Too many validation requests, please slow down.' },
+    message: { error: 'Too many guesses, please slow down.' },
   });
 
   app.use(express.json({ limit: '10kb' }));
@@ -70,7 +70,7 @@ export const createApp = (env = process.env) => {
     res.status(200).json({ status: 'ok' });
   });
 
-  app.use('/api/words', createWordRouter({ validateLimiter }));
+  app.use('/api/games', createGameRouter({ guessLimiter }));
 
   return app;
 };

@@ -3,7 +3,7 @@
 
 # Nerdle
 
-Nerdle is a Wordle-inspired experience that focuses on technology vocabulary. A React frontend pairs with an Express backend to serve randomized tech words, validate guesses, show letter-flip animations, and store persistent gameplay statistics.
+Nerdle is a Wordle-inspired experience that focuses on technology vocabulary. A React frontend pairs with an Express backend to run server-owned games, validate and score guesses, show letter-flip animations, and store persistent gameplay statistics.
 
 Live: `https://nerdle.nathanzimmerman.com`
 
@@ -13,6 +13,7 @@ Live: `https://nerdle.nathanzimmerman.com`
 - **Animated feedback**: Tile flip animations reveal correct/present/absent letters; results also apply to the on-screen keyboard.
 - **Stats (per word length)**: Trophy modal shows games played, win %, current/max streak, fastest solve time, and fewest guesses (stored in `localStorage`).
 - **Theme toggle**: Light/dark mode, persisted in `localStorage`.
+- **Server-owned games**: Target words stay on the server. The browser receives an opaque game ID and tile scores, preventing the answer from leaking through browser developer tools.
 - **Server-side guess validation**: A guess is valid if it’s either in the curated tech list or the `word-list` dictionary for that word length.
 
 ## Tech Stack
@@ -30,12 +31,13 @@ See [`docs/architecture.md`](docs/architecture.md) for runtime boundaries, quali
 - **CORS**: Strict origin allowlist; only trusted domains and localhost (in dev) are permitted.
 - **Rate Limiting**:
   - Global: 100 requests per 15 minutes per IP.
-  - `/api/words/validate`: 20 requests per minute to prevent brute-force guessing.
-- **Input Validation**: The `/validate` endpoint enforces:
+  - Game guesses: 20 requests per minute to prevent brute-force guessing.
+- **Input Validation**: The guess endpoint enforces:
   - Alphabetic characters only (`a-zA-Z`).
   - Length between 1–10 characters.
 - **Body Size Limit**: JSON payloads capped at 10KB to prevent large payload attacks.
-- **Gameplay Tradeoff**: The target word is sent to the browser for this casual game. This is documented in `docs/architecture.md`; a cheat-resistant version would keep answers server-side.
+- **Answer Secrecy**: Target words are stored in bounded, expiring server memory and are returned only after a game ends. Game IDs are random UUIDs.
+- **Deployment Note**: In-progress games do not survive an API restart. A multi-instance deployment should move game state to Redis or a database.
 
 ## Getting Started
 
@@ -152,13 +154,23 @@ cd ../server && npm ci
 - `GET /api/health`  
   Returns `{ "status": "ok" }`.
 
-- `GET /api/words/random`  
-  Returns a random tech word. Supports `?length=4|5|6` (default: `5`).
+- `POST /api/games`
 
-- `POST /api/words/validate`  
-  Validates a guess against both the curated tech list and the `word-list` dictionary for the submitted word length.  
-  Request body: `{ "word": "guess" }`  
-  Response: `{ "valid": true || false }`
+  Starts a server-owned game.
+
+  Request body: `{ "wordLength": 4 | 5 | 6 }`
+
+  Response: `{ "gameId": "...", "wordLength": 5, "maxAttempts": 6 }`
+
+- `POST /api/games/:gameId/guesses`
+
+  Validates and scores a guess against the server-side answer. Invalid dictionary words do not consume an attempt.
+
+  Request body: `{ "word": "guess" }`
+
+  Active-game response: `{ "valid": true, "score": [...], "won": false, "complete": false, "attemptsRemaining": 5 }`
+
+  The terminal response also includes `answer`.
 
 ## Gameplay & Experience
 

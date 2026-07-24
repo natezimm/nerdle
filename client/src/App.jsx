@@ -21,7 +21,6 @@ const App = () => {
     return 'light';
   });
   const {
-    targetWord,
     attempts,
     currentGuess,
     message,
@@ -93,7 +92,6 @@ const App = () => {
         <WordGrid
           attempts={attempts}
           currentGuess={currentGuess}
-          targetWord={targetWord}
           wordLength={wordLength}
         />
       </div>

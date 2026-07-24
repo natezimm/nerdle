@@ -22,27 +22,59 @@ const typeKeys = async (keys) => {
     });
   }
 };
+const guessCalls = () =>
+  axios.post.mock.calls.filter(([url]) => url.includes('/guesses'));
+
+const scoresByWord = {
+  apple: ['correct', 'correct', 'correct', 'correct', 'correct'],
+  plane: ['present', 'present', 'present', 'absent', 'correct'],
+  allee: ['correct', 'present', 'absent', 'absent', 'correct'],
+  axxxx: ['correct', 'absent', 'absent', 'absent', 'absent'],
+  baaaa: ['absent', 'present', 'absent', 'absent', 'absent'],
+};
 
 describe('App', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    let attemptCount = 0;
+    axios.post.mockImplementation((url, body) => {
+      if (url === '/api/games') {
+        return Promise.resolve({
+          data: { gameId: 'game-1', wordLength: 5, maxAttempts: 6 },
+        });
+      }
+
+      attemptCount += 1;
+      const won = body.word === 'apple';
+      const complete = won || attemptCount >= 6;
+      return Promise.resolve({
+        data: {
+          valid: true,
+          score: scoresByWord[body.word] ?? Array(5).fill('absent'),
+          won,
+          complete,
+          attemptsRemaining: 6 - attemptCount,
+          ...(complete ? { answer: 'apple' } : {}),
+        },
+      });
+    });
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  test('falls back to default API URL when env var is missing', async () => {
+  test('starts a game using the default API path', async () => {
     const previousApiUrl = import.meta.env.VITE_API_URL;
     delete import.meta.env.VITE_API_URL;
 
-    axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
     render(<App />);
 
     await waitFor(() =>
-      expect(axios.get).toHaveBeenCalledWith(
-        expect.stringContaining('/api/words/random'),
+      expect(axios.post).toHaveBeenCalledWith(
+        '/api/games',
+        { wordLength: 5 },
         expect.objectContaining({ signal: expect.any(Object) })
       )
     );
@@ -54,40 +86,52 @@ describe('App', () => {
     }
   });
 
-  test('shows fetch error message when random word API fails', async () => {
-    axios.get.mockRejectedValueOnce(new Error('network failure'));
+  test('shows an error message when starting a game fails', async () => {
+    axios.post.mockRejectedValueOnce(new Error('network failure'));
     render(<App />);
     expect(
-      await screen.findByText(/Failed to fetch the word/i)
+      await screen.findByText(/Failed to start a game/i)
     ).toBeInTheDocument();
   });
 
   test('rejects guesses that are too short', async () => {
-    axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
     render(<App />);
+    await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(1));
     await typeKeys('app{Enter}');
     expect(screen.getByText(/Guess must be 5 letters/i)).toBeInTheDocument();
-    expect(axios.post).not.toHaveBeenCalled();
+    expect(guessCalls()).toHaveLength(0);
   });
 
-  test('shows invalid word message when validate API marks it invalid', async () => {
-    axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
-    axios.post.mockResolvedValueOnce({ data: { valid: false } });
+  test('shows invalid word message when the guess API marks it invalid', async () => {
+    axios.post.mockImplementation((url) =>
+      Promise.resolve({
+        data:
+          url === '/api/games'
+            ? { gameId: 'game-1', wordLength: 5, maxAttempts: 6 }
+            : { valid: false },
+      })
+    );
     render(<App />);
     await typeKeys('apple{Enter}');
     expect(
       await screen.findByText(/Invalid word\. Try again\./i)
     ).toBeInTheDocument();
     expect(axios.post).toHaveBeenCalledWith(
-      expect.stringContaining('/api/words/validate'),
+      '/api/games/game-1/guesses',
       { word: 'apple' },
       expect.objectContaining({ signal: expect.any(Object) })
     );
   });
 
-  test('displays retry message when validation API throws', async () => {
-    axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
-    axios.post.mockRejectedValueOnce(new Error('validation failure'));
+  test('displays retry message when the guess API throws', async () => {
+    axios.post.mockImplementation((url) => {
+      if (url === '/api/games') {
+        return Promise.resolve({
+          data: { gameId: 'game-1', wordLength: 5, maxAttempts: 6 },
+        });
+      }
+      return Promise.reject(new Error('guess failure'));
+    });
     render(<App />);
     await typeKeys('apple{Enter}');
     expect(
@@ -99,26 +143,23 @@ describe('App', () => {
     vi.useFakeTimers();
     const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(0);
     try {
-      axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
-      axios.post.mockResolvedValueOnce({ data: { valid: true } });
       render(<App />);
       await typeKeys('apple{Enter}');
-      await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(guessCalls()).toHaveLength(1));
       act(() => {
         vi.advanceTimersByTime(2000);
       });
       expect(await screen.findByText(/Congratulations!/i)).toBeInTheDocument();
       expect(screen.queryByText('Statistics')).not.toBeInTheDocument();
-      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(guessCalls()).toHaveLength(1);
       await typeKeys('{Enter}');
-      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(guessCalls()).toHaveLength(1);
     } finally {
       nowSpy.mockRestore();
     }
   });
 
   test('backspace removes letters from the current guess', async () => {
-    axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
     const { container } = render(<App />);
     await typeKeys('ab');
     const letterCells = container.querySelectorAll(
@@ -133,8 +174,6 @@ describe('App', () => {
 
   test('updates keyboard letter statuses after a guess', async () => {
     vi.useFakeTimers();
-    axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
-    axios.post.mockResolvedValueOnce({ data: { valid: true } });
     render(<App />);
     await typeKeys('plane{Enter}');
     // updateLetterStatuses uses a 1500ms timeout
@@ -154,8 +193,6 @@ describe('App', () => {
 
   test('handles repeated letters and updates statuses correctly', async () => {
     vi.useFakeTimers();
-    axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
-    axios.post.mockResolvedValueOnce({ data: { valid: true } });
     render(<App />);
     await typeKeys('allee{Enter}');
     act(() => {
@@ -171,9 +208,6 @@ describe('App', () => {
 
   test("doesn't downgrade 'correct' statuses on later guesses", async () => {
     vi.useFakeTimers();
-    axios.get.mockResolvedValue({ data: { word: 'apple' } });
-    // Make all validation calls succeed
-    axios.post.mockResolvedValue({ data: { valid: true } });
     render(<App />);
 
     // First guess: 'a----' to set 'a' as correct
@@ -194,8 +228,6 @@ describe('App', () => {
 
   test('clears prior messages after a non-final valid guess', async () => {
     vi.useFakeTimers();
-    axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
-    axios.post.mockResolvedValue({ data: { valid: true } });
     render(<App />);
 
     // Trigger a short-guess message
@@ -217,7 +249,6 @@ describe('App', () => {
   });
 
   test('opens stats modal when stats button clicked', async () => {
-    axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
     await act(async () => {
       render(<App />);
     });
@@ -241,11 +272,9 @@ describe('App', () => {
     vi.useFakeTimers();
     const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(0);
     try {
-      axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
-      axios.post.mockResolvedValueOnce({ data: { valid: true } });
       render(<App />);
       await typeKeys('apple{Enter}');
-      await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(guessCalls()).toHaveLength(1));
       act(() => {
         vi.advanceTimersByTime(2000);
       });
@@ -257,13 +286,11 @@ describe('App', () => {
 
   test('calls updateStats with win=false after max attempts (loss)', async () => {
     vi.useFakeTimers();
-    axios.get.mockResolvedValue({ data: { word: 'apple' } });
-    axios.post.mockResolvedValue({ data: { valid: true } });
     render(<App />);
     const guesses = ['plane', 'plane', 'plane', 'plane', 'plane', 'plane'];
     for (const [i, g] of guesses.entries()) {
       await typeKeys(g + '{Enter}');
-      await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(i + 1));
+      await waitFor(() => expect(guessCalls()).toHaveLength(i + 1));
       act(() => {
         vi.advanceTimersByTime(1500);
       });
@@ -275,9 +302,8 @@ describe('App', () => {
   });
 
   test('renders footer with attribution link to nathanzimmerman.com', async () => {
-    axios.get.mockResolvedValueOnce({ data: { word: 'apple' } });
     render(<App />);
-    await waitFor(() => expect(axios.get).toHaveBeenCalled());
+    await waitFor(() => expect(axios.post).toHaveBeenCalled());
 
     const footer = document.querySelector('.site-footer');
     expect(footer).toBeInTheDocument();

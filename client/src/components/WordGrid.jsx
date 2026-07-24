@@ -1,21 +1,15 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { scoreGuess } from '../game/scoring';
+import React, { useEffect, useState } from 'react';
 import '../styles/WordGrid.css';
 
-const WordGrid = ({ attempts, currentGuess, targetWord, wordLength = 5 }) => {
+const WordGrid = ({ attempts, currentGuess, wordLength = 5 }) => {
   const totalRows = 6;
   const [flippedLetters, setFlippedLetters] = useState([]);
   const [flippingRow, setFlippingRow] = useState(null);
 
-  const scoredAttempts = useMemo(() => {
-    if (!targetWord) return [];
-    return attempts.map((attempt) => scoreGuess(targetWord, attempt));
-  }, [attempts, targetWord]);
-
   useEffect(() => {
     setFlippedLetters([]);
     setFlippingRow(null);
-  }, [wordLength, targetWord]);
+  }, [wordLength]);
 
   useEffect(() => {
     if (attempts.length === 0) return undefined;
@@ -82,16 +76,15 @@ const WordGrid = ({ attempts, currentGuess, targetWord, wordLength = 5 }) => {
       >
         {Array.from({ length: totalRows }).map((_, rowIndex) => {
           const isCurrentRow = rowIndex === attempts.length;
-          const guess = isCurrentRow ? currentGuess : attempts[rowIndex] || '';
+          const attempt = attempts[rowIndex];
+          const guess = isCurrentRow ? currentGuess : attempt?.word || '';
 
           return (
             <div key={rowIndex} className="word-row">
               {Array.from({ length: wordLength }).map((_, letterIndex) => {
                 const letter = guess[letterIndex] || '';
                 const statusClass =
-                  !isCurrentRow && letter
-                    ? scoredAttempts[rowIndex]?.[letterIndex]
-                    : '';
+                  !isCurrentRow && letter ? attempt?.score?.[letterIndex] : '';
                 const filledClass = letter ? 'letter-filled' : 'letter-empty';
                 const flipClass = statusClass
                   ? getFlipClasses(statusClass, rowIndex, letterIndex)

@@ -11,7 +11,15 @@ describe('WordGrid', () => {
   test('renders persisted statuses for an attempt', () => {
     vi.useFakeTimers();
     const { container } = render(
-      <WordGrid attempts={['plane']} currentGuess="" targetWord="apple" />
+      <WordGrid
+        attempts={[
+          {
+            word: 'plane',
+            score: ['present', 'present', 'present', 'absent', 'correct'],
+          },
+        ]}
+        currentGuess=""
+      />
     );
     act(() => {
       vi.advanceTimersByTime(2000);
@@ -28,7 +36,15 @@ describe('WordGrid', () => {
   test('shows flip classes while animating', () => {
     vi.useFakeTimers();
     const { container } = render(
-      <WordGrid attempts={['plane']} currentGuess="" targetWord="apple" />
+      <WordGrid
+        attempts={[
+          {
+            word: 'plane',
+            score: ['present', 'present', 'present', 'absent', 'correct'],
+          },
+        ]}
+        currentGuess=""
+      />
     );
     // advance only the first flip (300ms)
     act(() => {

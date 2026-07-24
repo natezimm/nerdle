@@ -1,20 +1,36 @@
 import { expect, test } from '@playwright/test';
 
 const mockWordApi = async (page) => {
-  await page.route('**/api/words/random?**', async (route) => {
-    const url = new URL(route.request().url());
-    const length = Number(url.searchParams.get('length') ?? 5);
+  let targetWord = 'react';
+
+  await page.route('**/api/games/*/guesses', async (route) => {
+    const { word } = route.request().postDataJSON();
+    const won = word === targetWord;
+    await route.fulfill({
+      json: {
+        valid: true,
+        score: Array(targetWord.length).fill(won ? 'correct' : 'absent'),
+        won,
+        complete: won,
+        attemptsRemaining: won ? 5 : 4,
+        ...(won ? { answer: targetWord } : {}),
+      },
+    });
+  });
+
+  await page.route('**/api/games', async (route) => {
+    const { wordLength = 5 } = route.request().postDataJSON();
     const words = {
       4: 'code',
       5: 'react',
       6: 'server',
     };
+    targetWord = words[wordLength] ?? 'react';
 
-    await route.fulfill({ json: { word: words[length] ?? 'react' } });
-  });
-
-  await page.route('**/api/words/validate', async (route) => {
-    await route.fulfill({ json: { valid: true } });
+    await route.fulfill({
+      status: 201,
+      json: { gameId: 'test-game', wordLength, maxAttempts: 6 },
+    });
   });
 };
 

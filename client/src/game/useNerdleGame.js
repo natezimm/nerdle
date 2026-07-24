@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
-import { fetchRandomWord, isCanceledRequest, validateWord } from '../api/words';
+import { createGame, isCanceledRequest, submitGameGuess } from '../api/games';
 import { updateStats } from '../utils/stats';
-import { mergeKeyboardStatuses, scoreGuess } from './scoring';
+import { mergeKeyboardStatuses } from './scoring';
 
 const MAX_ATTEMPTS = 6;
 const FLIP_DELAY_MS = 300;
@@ -12,7 +12,7 @@ const FLIP_DELAY_MS = 300;
  */
 
 const createInitialState = () => ({
-  targetWord: '',
+  gameId: '',
   attempts: [],
   currentGuess: '',
   message: '',
@@ -26,17 +26,17 @@ const gameReducer = (state, action) => {
   switch (action.type) {
     case 'reset':
       return createInitialState();
-    case 'wordLoaded':
+    case 'gameLoaded':
       return {
         ...state,
-        targetWord: action.word,
+        gameId: action.gameId,
         startTime: action.startTime,
         status: 'playing',
       };
     case 'loadFailed':
       return {
         ...state,
-        message: 'Failed to fetch the word. Please try again later.',
+        message: 'Failed to start a game. Please try again later.',
         status: 'error',
       };
     case 'setMessage':
@@ -140,14 +140,18 @@ export const useNerdleGame = (wordLength) => {
 
     dispatch({ type: 'reset' });
 
-    fetchRandomWord(wordLength, { signal: controller.signal })
-      .then((word) => {
-        dispatch({ type: 'wordLoaded', word, startTime: Date.now() });
+    createGame(wordLength, { signal: controller.signal })
+      .then((game) => {
+        dispatch({
+          type: 'gameLoaded',
+          gameId: game.gameId,
+          startTime: Date.now(),
+        });
       })
       .catch((error) => {
         if (isCanceledRequest(error)) return;
 
-        console.error('Error fetching the word:', error);
+        console.error('Error starting the game:', error);
         dispatch({ type: 'loadFailed' });
       });
 
@@ -176,10 +180,10 @@ export const useNerdleGame = (wordLength) => {
       return;
     }
 
-    if (!currentState.targetWord) {
+    if (!currentState.gameId) {
       dispatch({
         type: 'setMessage',
-        message: 'Still loading the word. Please wait.',
+        message: 'Still starting the game. Please wait.',
       });
       return;
     }
@@ -197,25 +201,29 @@ export const useNerdleGame = (wordLength) => {
     validationControllerRef.current = controller;
     dispatch({ type: 'validationStarted' });
 
-    validateWord(guess, { signal: controller.signal })
-      .then((isValid) => {
+    submitGameGuess(currentState.gameId, guess, {
+      signal: controller.signal,
+    })
+      .then((result) => {
         const latestState = stateRef.current;
 
-        if (!isValid) {
+        if (!result.valid) {
           dispatch({ type: 'validationRejected' });
           return;
         }
 
-        const score = scoreGuess(latestState.targetWord, guess);
         const nextLetterStatuses = mergeKeyboardStatuses(
           latestState.letterStatuses,
           guess,
-          score
+          result.score
         );
         const attemptCount = latestState.attempts.length + 1;
         const revealDelay = FLIP_DELAY_MS * wordLength;
 
-        dispatch({ type: 'guessAccepted', guess });
+        dispatch({
+          type: 'guessAccepted',
+          guess: { word: guess, score: result.score },
+        });
 
         schedule(() => {
           dispatch({
@@ -224,7 +232,7 @@ export const useNerdleGame = (wordLength) => {
           });
         }, revealDelay);
 
-        if (guess === latestState.targetWord) {
+        if (result.won) {
           schedule(() => {
             const timeTaken = Date.now() - latestState.startTime;
             updateStats(true, attemptCount, timeTaken, wordLength);
@@ -236,12 +244,12 @@ export const useNerdleGame = (wordLength) => {
           return;
         }
 
-        if (attemptCount >= MAX_ATTEMPTS) {
+        if (result.complete) {
           schedule(() => {
             updateStats(false, MAX_ATTEMPTS, null, wordLength);
             dispatch({
               type: 'gameComplete',
-              message: `Game over! The word was ${latestState.targetWord}.`,
+              message: `Game over! The word was ${result.answer}.`,
             });
           }, revealDelay);
           return;
@@ -254,7 +262,7 @@ export const useNerdleGame = (wordLength) => {
       .catch((error) => {
         if (isCanceledRequest(error)) return;
 
-        console.error('Error validating the word:', error);
+        console.error('Error submitting the guess:', error);
         dispatch({ type: 'validationFailed' });
       });
   }, [schedule, wordLength]);

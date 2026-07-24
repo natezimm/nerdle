@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import request from 'supertest';
 import { createApp, createCorsOptions } from '../app.js';
 
 const getRouteHandler = (app, method, path) => {
@@ -29,7 +30,7 @@ describe('app', () => {
     expect(res.json).toHaveBeenCalledWith({ status: 'ok' });
   });
 
-  test('mounts the word router', () => {
+  test('mounts the game router', () => {
     const app = createApp({ NODE_ENV: 'test' });
     const mountedRouters = app._router.stack.filter(
       (layer) => layer.name === 'router'
@@ -67,5 +68,44 @@ describe('app', () => {
     expect(configuredCallback).toHaveBeenCalledWith(null, true);
     expect(localCallback).toHaveBeenCalledWith(null, true);
     expect(noOriginCallback).toHaveBeenCalledWith(null, true);
+  });
+
+  test('applies the global rate limit across all API routes', async () => {
+    const app = createApp({ NODE_ENV: 'test' });
+
+    for (let requestNumber = 0; requestNumber < 99; requestNumber += 1) {
+      await request(app).get('/api/health').expect(200);
+    }
+
+    await request(app).post('/api/games').send({ wordLength: 5 }).expect(201);
+
+    const rejected = await request(app)
+      .post('/api/games')
+      .send({ wordLength: 5 })
+      .expect(429);
+    expect(rejected.body).toEqual({
+      error: 'Too many requests, please try again later.',
+    });
+    expect(rejected.headers['ratelimit-limit']).toBeDefined();
+  });
+
+  test('applies the stricter guess endpoint rate limit', async () => {
+    const app = createApp({ NODE_ENV: 'test' });
+
+    for (let requestNumber = 0; requestNumber < 20; requestNumber += 1) {
+      await request(app)
+        .post('/api/games/missing/guesses')
+        .send({ word: 'hello' })
+        .expect(404);
+    }
+
+    const rejected = await request(app)
+      .post('/api/games/missing/guesses')
+      .send({ word: 'hello' })
+      .expect(429);
+
+    expect(rejected.body).toEqual({
+      error: 'Too many guesses, please slow down.',
+    });
   });
 });
