@@ -104,3 +104,17 @@
     display: none;
   }
 }
+
+@media (max-width: 600px) {
+  .game-container .header {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .game-container .header-actions {
+    width: 100%;
+  }
+  .header-actions .new-game-button {
+    margin-right: auto;
+    padding-inline: 10px;
+  }
+}

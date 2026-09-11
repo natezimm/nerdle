@@ -9,6 +9,7 @@ const SettingsModal = ({
   onToggleTheme,
   wordLength,
   onWordLengthChange,
+  wordLengthDisabled = false,
   windowStyle = 'auto',
   onWindowStyleChange,
   boardStyle = 'tiles',
@@ -85,6 +86,7 @@ const SettingsModal = ({
                   type="button"
                   className={`settings-option ${wordLength === len ? 'selected' : ''}`}
                   onClick={() => onWordLengthChange(len)}
+                  disabled={wordLengthDisabled}
                   aria-pressed={wordLength === len}
                 >
                   {len}

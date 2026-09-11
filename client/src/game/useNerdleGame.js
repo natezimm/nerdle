@@ -102,6 +102,7 @@ const gameReducer = (state, action) => {
 };
 
 export const useNerdleGame = (wordLength) => {
+  const [gameNumber, nextGame] = useReducer((number) => number + 1, 0);
   const [state, dispatch] = useReducer(
     gameReducer,
     undefined,
@@ -142,6 +143,7 @@ export const useNerdleGame = (wordLength) => {
 
     createGame(wordLength, { signal: controller.signal })
       .then((game) => {
+        if (controller.signal.aborted) return;
         dispatch({
           type: 'gameLoaded',
           gameId: game.gameId,
@@ -149,7 +151,7 @@ export const useNerdleGame = (wordLength) => {
         });
       })
       .catch((error) => {
-        if (isCanceledRequest(error)) return;
+        if (controller.signal.aborted || isCanceledRequest(error)) return;
 
         console.error('Error starting the game:', error);
         dispatch({ type: 'loadFailed' });
@@ -159,7 +161,7 @@ export const useNerdleGame = (wordLength) => {
       controller.abort();
       clearTimers();
     };
-  }, [clearTimers, wordLength]);
+  }, [clearTimers, wordLength, gameNumber]);
 
   useEffect(() => {
     return () => {
@@ -205,6 +207,7 @@ export const useNerdleGame = (wordLength) => {
       signal: controller.signal,
     })
       .then((result) => {
+        if (controller.signal.aborted) return;
         const latestState = stateRef.current;
 
         if (!result.valid) {
@@ -260,7 +263,7 @@ export const useNerdleGame = (wordLength) => {
         }, revealDelay);
       })
       .catch((error) => {
-        if (isCanceledRequest(error)) return;
+        if (controller.signal.aborted || isCanceledRequest(error)) return;
 
         console.error('Error submitting the guess:', error);
         dispatch({ type: 'validationFailed' });
@@ -294,12 +297,28 @@ export const useNerdleGame = (wordLength) => {
     [submitGuess, wordLength]
   );
 
+  const startNewGame = useCallback(() => {
+    const current = stateRef.current;
+    if (current.status === 'validating' || current.status === 'revealing')
+      return;
+    if (current.status === 'playing' && current.attempts.length > 0) {
+      updateStats(false, current.attempts.length, null, wordLength);
+    }
+    loadControllerRef.current?.abort();
+    validationControllerRef.current?.abort();
+    clearTimers();
+    stateRef.current = createInitialState();
+    dispatch({ type: 'reset' });
+    nextGame();
+  }, [clearTimers, wordLength]);
+
   const clearMessage = useCallback(() => {
     dispatch({ type: 'setMessage', message: '' });
   }, []);
 
   return {
     ...state,
+    startNewGame,
     gameOver: state.status === 'complete',
     handleKeyPress,
     clearMessage,

@@ -121,3 +121,12 @@ export const formatTime = (ms) => {
   const remainingSeconds = seconds % 60;
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
+
+/** @param {number | 'all'} [wordLength] */
+export const resetStats = (wordLength = DEFAULT_WORD_LENGTH) => {
+  const allStats =
+    wordLength === 'all' ? createEmptyAllStats() : loadAllStats();
+  if (wordLength !== 'all')
+    allStats.byLength[normalizeLengthKey(wordLength)] = createEmptyStats();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(allStats));
+};

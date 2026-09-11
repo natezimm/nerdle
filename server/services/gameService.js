@@ -51,6 +51,7 @@ export const scoreGuess = (targetWord, guess) => {
 
 export const createGameService = ({
   selectWord = getRandomTechWord,
+  random = Math.random,
   createId = randomUUID,
   now = Date.now,
   ttlMs = GAME_TTL_MS,
@@ -190,16 +191,17 @@ export const createGameService = ({
         result: { category: wordCategories[game.targetWord] },
       };
     if (!game.hint) {
-      const index = [...game.targetWord].findIndex(
-        (_, index) => !game.solvedPositions.has(index)
-      );
-      if (index === -1)
+      const positions = [...game.targetWord]
+        .map((_, index) => index)
+        .filter((index) => !game.solvedPositions.has(index));
+      if (positions.length === 0)
         return {
           ok: false,
           status: 409,
           error:
             'You’ve already found every letter’s position. Use your green tiles to finish!',
         };
+      const index = positions[Math.floor(random() * positions.length)];
       game.hint = { position: index + 1, letter: game.targetWord[index] };
     }
     return { ok: true, result: game.hint };

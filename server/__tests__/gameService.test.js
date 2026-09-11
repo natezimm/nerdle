@@ -158,7 +158,10 @@ describe('gameService', () => {
 });
 
 test('hints skip solved positions, stay the same, and cost no attempts', () => {
-  const service = createGameService({ selectWord: () => 'apple' });
+  const service = createGameService({
+    selectWord: () => 'apple',
+    random: () => 0,
+  });
   const { gameId } = service.createGame(5);
   service.submitGuess(gameId, 'allee');
   const hint = service.getHint(gameId);
@@ -184,12 +187,16 @@ test('hints reject missing and expired games', () => {
 test('category hints cover every answer without consuming the letter hint', async () => {
   const { techWordsByLength } = await import('../techWords.js');
   for (const word of Object.values(techWordsByLength).flat()) {
-    const service = createGameService({ selectWord: () => word });
+    const service = createGameService({
+      selectWord: () => word,
+      random: () => 0,
+    });
     const { gameId } = service.createGame(word.length);
     const category = service.getHint(gameId, 'category');
     expect(category.ok).toBe(true);
     expect(category.result.category).toEqual(expect.any(String));
     expect(category.result.category.length).toBeGreaterThan(5);
+    expect(category.result.category.toLowerCase()).not.toContain(word);
     expect(Object.keys(category.result)).toEqual(['category']);
     expect(service.getHint(gameId, 'letter').result).toEqual({
       position: 1,
@@ -198,4 +205,14 @@ test('category hints cover every answer without consuming the letter hint', asyn
     expect(service.submitGuess(gameId, word).result.attemptsRemaining).toBe(5);
   }
   expect(createGameService().getHint('missing', 'unknown').status).toBe(400);
+});
+
+test('random hints can select later unsolved positions and are drawn only once', () => {
+  const random = jest.fn(() => 0.99);
+  const service = createGameService({ selectWord: () => 'apple', random });
+  const { gameId } = service.createGame(5);
+  service.submitGuess(gameId, 'allee');
+  expect(service.getHint(gameId).result).toEqual({ position: 4, letter: 'l' });
+  expect(service.getHint(gameId).result).toEqual({ position: 4, letter: 'l' });
+  expect(random).toHaveBeenCalledTimes(1);
 });

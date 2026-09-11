@@ -87,7 +87,8 @@
   text-transform: lowercase;
 }
 
-[data-app-style='terminal'] :is(.stats-button, .settings-button) {
+[data-app-style='terminal']
+  :is(.new-game-button, .stats-button, .settings-button) {
   width: auto;
   min-width: 40px;
   padding-inline: 8px;
@@ -100,7 +101,8 @@
   transform: none;
 }
 
-[data-app-style='terminal'] :is(.stats-button, .settings-button):hover {
+[data-app-style='terminal']
+  :is(.new-game-button, .stats-button, .settings-button):hover {
   background: var(--key-hover-bg);
   border-color: var(--color-accent);
 }
@@ -309,7 +311,8 @@
     padding-inline: 10px;
   }
 
-  [data-app-style='terminal'] :is(.stats-button, .settings-button) {
+  [data-app-style='terminal']
+    :is(.new-game-button, .stats-button, .settings-button) {
     padding-inline: 5px;
   }
 

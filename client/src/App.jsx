@@ -47,6 +47,7 @@ const App = () => {
     letterStatuses,
     handleKeyPress,
     clearMessage,
+    startNewGame,
   } = useNerdleGame(wordLength);
 
   useEffect(() => {
@@ -87,6 +88,21 @@ const App = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyPress, isStatsOpen, isSettingsOpen, activeHint]);
+
+  const requestNewGame = (nextLength = wordLength) => {
+    if (['loading', 'validating', 'revealing'].includes(status)) return;
+    if (
+      status === 'playing' &&
+      attempts.length > 0 &&
+      !window.confirm(
+        'Starting a new game will count this one as a loss. Start a new game?'
+      )
+    )
+      return;
+    setActiveHint('');
+    startNewGame();
+    setWordLength(nextLength);
+  };
 
   const solved = attempts.at(-1)?.score.every((score) => score === 'correct');
   const attemptNumber = Math.min(
@@ -132,6 +148,14 @@ const App = () => {
         </div>
         <div className="header-actions">
           <button
+            className="new-game-button"
+            onClick={() => requestNewGame()}
+            disabled={['loading', 'validating', 'revealing'].includes(status)}
+          >
+            <span aria-hidden="true">↻</span> New game
+          </button>
+
+          <button
             className="stats-button"
             onClick={() => setIsStatsOpen(true)}
             aria-label="Statistics"
@@ -176,7 +200,12 @@ const App = () => {
           setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'))
         }
         wordLength={wordLength}
-        onWordLengthChange={(len) => setWordLength(len)}
+        onWordLengthChange={(len) => {
+          if (len !== wordLength) requestNewGame(len);
+        }}
+        wordLengthDisabled={['loading', 'validating', 'revealing'].includes(
+          status
+        )}
         windowStyle={windowStyle}
         onWindowStyleChange={setWindowStyle}
         boardStyle={boardStyle}
@@ -213,24 +242,34 @@ const App = () => {
               `guess ${String(attemptNumber).padStart(2, '0')} / 06`}
           </span>
         </div>
-        <div className="board-hints" role="group" aria-label="Hints">
-          <span className="hints-label">Hints</span>
-          <button
-            className="hint-button"
-            onClick={() => setActiveHint('category')}
-            disabled={status !== 'playing'}
-            aria-label="Category hint"
+        <div className="board-actions">
+          <div
+            className="board-hints"
+            role="group"
+            aria-labelledby="hints-label"
           >
-            Category
-          </button>
-          <button
-            className="hint-button"
-            onClick={() => setActiveHint('letter')}
-            disabled={status !== 'playing'}
-            aria-label="Letter hint"
-          >
-            Letter
-          </button>
+            <span id="hints-label" className="hints-label">
+              Hints
+            </span>
+            <div className="hint-options">
+              <button
+                className="hint-button"
+                onClick={() => setActiveHint('category')}
+                disabled={status !== 'playing'}
+                aria-label="Category hint"
+              >
+                Category
+              </button>
+              <button
+                className="hint-button"
+                onClick={() => setActiveHint('letter')}
+                disabled={status !== 'playing'}
+                aria-label="Letter hint"
+              >
+                Letter
+              </button>
+            </div>
+          </div>
         </div>
         <WordGrid
           attempts={attempts}

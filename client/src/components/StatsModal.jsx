@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import './StatsModal.css';
-import { getStats, formatTime } from '../utils/stats';
+import { getStats, formatTime, resetStats } from '../utils/stats';
 import { useModalBehavior } from '../hooks/useModalBehavior';
 
 const StatsModal = ({ isOpen, onClose, wordLength = 5 }) => {
+  const [, refresh] = useReducer((value) => value + 1, 0);
+  const requestReset = (scope) => {
+    const label =
+      scope === 'all' ? 'all word lengths' : `${wordLength}-letter games`;
+    if (!window.confirm(`Reset stats for ${label}? This cannot be undone.`))
+      return;
+    resetStats(scope);
+    refresh();
+  };
   const dialogRef = useModalBehavior({ isOpen, onClose });
 
   if (!isOpen) return null;
@@ -68,6 +77,20 @@ const StatsModal = ({ isOpen, onClose, wordLength = 5 }) => {
               {stats.fewestGuesses !== null ? stats.fewestGuesses : '--'}
             </span>
           </div>
+        </div>
+        <div className="stats-reset" role="group" aria-label="Reset statistics">
+          <button
+            className="settings-action"
+            onClick={() => requestReset(wordLength)}
+          >
+            Reset {wordLength}-letter stats
+          </button>
+          <button
+            className="stats-reset-all"
+            onClick={() => requestReset('all')}
+          >
+            Reset all word lengths
+          </button>
         </div>
       </div>
     </div>

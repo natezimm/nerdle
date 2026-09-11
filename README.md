@@ -9,9 +9,13 @@ Live: `https://nerdle.nathanzimmerman.com`
 
 ## Features
 
+- **Play anytime**: Use **New game** above the grid to start another random-word game. Your word length, appearance, and saved stats stay unchanged; the board and hints reset. Starting over after a valid guess counts as a loss, with confirmation; untouched games do not.
+- **Optional hints**: Reveal a technology category or one randomly selected unsolved letter without using a guess.
+
 - **4/5/6-letter games**: Choose word length from the settings modal; each new game fetches a random tech word of that length.
 - **Animated feedback**: Tile flip animations reveal correct/present/absent letters; results also apply to the on-screen keyboard.
 - **Stats (per word length)**: Trophy modal shows games played, win %, current/max streak, fastest solve time, and fewest guesses (stored in `localStorage`).
+- **Reset stats**: Clear the selected word length or all word lengths from Statistics, with confirmation.
 - **Theme toggle**: Light/dark mode, persisted in `localStorage`.
 - **Server-owned games**: Target words stay on the server. The browser receives an opaque game ID and tile scores, preventing the answer from leaking through browser developer tools.
 - **Server-side guess validation**: A guess is valid if it’s either in the curated tech list or the `word-list` dictionary for that word length.
@@ -67,10 +71,10 @@ cd ../server && npm ci
 
    ```bash
    cd server
-   npm start
+   npm run dev
    ```
 
-   The server listens on `http://localhost:4000` by default and exposes the API used by the client.
+   The server listens on `http://localhost:4000` and automatically restarts when server files change. A restart clears in-progress games. Use `npm start` to run without automatic reloading.
 
 2. **Client** (port `3000`)
    ```bash

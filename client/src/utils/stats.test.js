@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from 'vitest';
-import { formatTime, getStats, updateStats } from './stats';
+import { formatTime, getStats, updateStats, resetStats } from './stats';
 
 describe('stats utility helpers', () => {
   beforeEach(() => {
@@ -120,4 +120,18 @@ describe('stats utility helpers', () => {
     expect(formatTime(65000)).toBe('1:05');
     expect(formatTime(125000)).toBe('2:05');
   });
+});
+
+test('resetting one length preserves other stats and preferences; all clears each length', () => {
+  localStorage.clear();
+  localStorage.setItem('theme', 'dark');
+  for (const length of [4, 5, 6]) updateStats(true, 2, 3000, length);
+  resetStats(5);
+  expect(getStats(5).totalGames).toBe(0);
+  expect(getStats(5).fastestSolveTime).toBeNull();
+  expect(getStats(4).wins).toBe(1);
+  expect(getStats(6).wins).toBe(1);
+  resetStats('all');
+  for (const length of [4, 5, 6]) expect(getStats(length).totalGames).toBe(0);
+  expect(localStorage.getItem('theme')).toBe('dark');
 });

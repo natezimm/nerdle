@@ -217,6 +217,142 @@ test.describe('nerdle client', () => {
     ]);
   });
 
+  test('starts another game after a win and resets hints and draft guesses', async ({
+    page,
+  }) => {
+    let starts = 0;
+    await page.route('**/api/games', async (route) => {
+      starts += 1;
+      await route.fulfill({
+        status: 201,
+        json: { gameId: `game-${starts}`, wordLength: 5, maxAttempts: 6 },
+      });
+    });
+    await page.route('**/api/games/*/hint', async (route) => {
+      await route.fulfill({ json: { position: 1, letter: 'r' } });
+    });
+    await page.goto('/');
+    await page
+      .getByRole('button', { name: 'Letter hint', exact: true })
+      .click();
+    await page.getByRole('button', { name: 'Reveal letter' }).click();
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Letter 1 is R.' })
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Close hint' }).click();
+    await page.keyboard.type('react');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.board-status')).toHaveText('solved ✓');
+    const stats = await page.evaluate(() => JSON.stringify(localStorage));
+    await page.getByRole('button', { name: 'New game', exact: true }).click();
+    await expect(page.locator('.board-status')).toHaveText('guess 01 / 06');
+    await expect(
+      page.locator('.letter').filter({ hasText: /[A-Z]/ })
+    ).toHaveCount(0);
+    await expect(page.locator('.key.correct')).toHaveCount(0);
+    await page
+      .getByRole('button', { name: 'Letter hint', exact: true })
+      .click();
+    await expect(
+      page.getByRole('button', { name: 'Reveal letter' })
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Close hint' }).click();
+    await page.keyboard.type('abc');
+    await page.getByRole('button', { name: 'New game', exact: true }).click();
+    await expect(page.locator('.board-status')).toHaveText('guess 01 / 06');
+    await expect(
+      page.locator('.letter').filter({ hasText: /[A-Z]/ })
+    ).toHaveCount(0);
+    expect(await page.evaluate(() => JSON.stringify(localStorage))).toBe(stats);
+    expect(starts).toBe(3);
+  });
+
+  test('confirms abandonment after a valid guess and counts exactly one loss', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await expect(page.locator('.board-status')).toHaveText('guess 01 / 06');
+    await page.keyboard.type('plane');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.board-status')).toHaveText('guess 02 / 06');
+    page.once('dialog', async (dialog) => {
+      expect(dialog.message()).toContain('count this one as a loss');
+      await dialog.dismiss();
+    });
+    await page.getByRole('button', { name: 'New game', exact: true }).click();
+    await expect(page.locator('.board-status')).toHaveText('guess 02 / 06');
+    expect(
+      await page.evaluate(() => localStorage.getItem('nerdle-stats'))
+    ).toBeNull();
+    page.once('dialog', (dialog) => dialog.accept());
+    await page.getByRole('button', { name: 'New game', exact: true }).click();
+    await expect(page.locator('.board-status')).toHaveText('guess 01 / 06');
+    expect(
+      await page.evaluate(
+        () => JSON.parse(localStorage.getItem('nerdle-stats')).byLength['5']
+      )
+    ).toMatchObject({ totalGames: 1, wins: 0, currentStreak: 0 });
+    await page.getByRole('button', { name: 'New game', exact: true }).click();
+    await expect(page.locator('.board-status')).toHaveText('guess 01 / 06');
+    expect(
+      await page.evaluate(
+        () =>
+          JSON.parse(localStorage.getItem('nerdle-stats')).byLength['5']
+            .totalGames
+      )
+    ).toBe(1);
+  });
+
+  test('confirms selected-length and all-length stat resets', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await page.evaluate(() => {
+      const stats = {
+        totalGames: 2,
+        wins: 1,
+        currentStreak: 1,
+        longestStreak: 1,
+        fastestSolveTime: 3000,
+        fewestGuesses: 2,
+      };
+      localStorage.setItem(
+        'nerdle-stats',
+        JSON.stringify({
+          version: 2,
+          byLength: { 4: stats, 5: stats, 6: stats },
+        })
+      );
+    });
+    await page.getByRole('button', { name: 'Statistics', exact: true }).click();
+    page.once('dialog', (dialog) => dialog.dismiss());
+    await page.getByRole('button', { name: 'Reset 5-letter stats' }).click();
+    expect(
+      await page.evaluate(
+        () =>
+          JSON.parse(localStorage.getItem('nerdle-stats')).byLength['5']
+            .totalGames
+      )
+    ).toBe(2);
+    page.once('dialog', (dialog) => dialog.accept());
+    await page.getByRole('button', { name: 'Reset 5-letter stats' }).click();
+    const byLength = await page.evaluate(
+      () => JSON.parse(localStorage.getItem('nerdle-stats')).byLength
+    );
+    expect(byLength['5'].totalGames).toBe(0);
+    expect(byLength['4'].totalGames).toBe(2);
+    expect(byLength['6'].totalGames).toBe(2);
+    page.once('dialog', (dialog) => dialog.accept());
+    await page.getByRole('button', { name: 'Reset all word lengths' }).click();
+    expect(
+      await page.evaluate(() =>
+        Object.values(
+          JSON.parse(localStorage.getItem('nerdle-stats')).byLength
+        ).map((stats) => stats.totalGames)
+      )
+    ).toEqual([0, 0, 0]);
+  });
+
   test('loads the game shell and controls', async ({ page }) => {
     await page.goto('/');
 
