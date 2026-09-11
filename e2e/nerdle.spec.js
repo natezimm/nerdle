@@ -148,6 +148,75 @@ test.describe('nerdle client', () => {
     await mockWordApi(page);
   });
 
+  test('offers independent category and letter hints above the grid', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 400 });
+    const requests = [];
+    await page.route('**/api/games/*/hint', async (route) => {
+      const { type } = route.request().postDataJSON();
+      requests.push(type);
+      await route.fulfill({
+        json:
+          type === 'category'
+            ? { category: 'Web & application frameworks' }
+            : { position: 1, letter: 'r' },
+      });
+    });
+    for (const style of ['tiles', 'terminal', 'full-terminal']) {
+      await page.goto('/');
+      await page.evaluate(
+        (style) => localStorage.setItem('boardStyle', style),
+        style
+      );
+      await page.reload();
+      for (const type of ['Category', 'Letter']) {
+        const button = page.getByRole('button', {
+          name: `${type} hint`,
+          exact: true,
+        });
+        await expect(button).toBeEnabled();
+        const box = await button.boundingBox();
+        const grid = await page.locator('.word-grid').boundingBox();
+        expect(box.y + box.height).toBeLessThanOrEqual(grid.y);
+        expect(box.x).toBeGreaterThanOrEqual(0);
+        expect(box.x + box.width).toBeLessThanOrEqual(320);
+        await button.click();
+        const dialog = page.getByRole('dialog', { name: `${type} hint` });
+        await dialog
+          .getByRole('button', { name: `Reveal ${type.toLowerCase()}` })
+          .click();
+        await expect(dialog.getByRole('status')).toContainText(
+          type === 'Category'
+            ? 'Web & application frameworks'
+            : 'Letter 1 is R.'
+        );
+        await page.keyboard.press('a');
+        await dialog.getByRole('button', { name: 'Close hint' }).click();
+        await expect(page.locator('.board-status')).toHaveText('guess 01 / 06');
+        await button.click();
+        await expect(dialog.getByRole('status')).toContainText(
+          type === 'Category'
+            ? 'Web & application frameworks'
+            : 'Letter 1 is R.'
+        );
+        await page.keyboard.press('Escape');
+      }
+      await expect(
+        page.locator('.letter').filter({ hasText: 'A' })
+      ).toHaveCount(0);
+      await page.screenshot({ path: `/tmp/nerdle-hints-${style}.png` });
+    }
+    expect(requests).toEqual([
+      'category',
+      'letter',
+      'category',
+      'letter',
+      'category',
+      'letter',
+    ]);
+  });
+
   test('loads the game shell and controls', async ({ page }) => {
     await page.goto('/');
 

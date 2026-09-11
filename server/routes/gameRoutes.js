@@ -35,6 +35,12 @@ const createGameRouter = ({
     return res.json(submission.result);
   });
 
+  router.post('/:gameId/hint', ...guessHandlers, (req, res) => {
+    const hint = gameService.getHint(req.params.gameId, req.body?.type);
+    if (!hint.ok) return res.status(hint.status).json({ error: hint.error });
+    return res.json(hint.result);
+  });
+
   return router;
 };
 

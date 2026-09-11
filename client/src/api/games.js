@@ -25,3 +25,12 @@ export const submitGameGuess = async (gameId, word, options = {}) => {
 export const isCanceledRequest = (error) => {
   return error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError';
 };
+
+export const requestGameHint = async (gameId, options = {}) => {
+  const response = await axios.post(
+    `/api/games/${encodeURIComponent(gameId)}/hint`,
+    { type: options.type ?? 'letter' },
+    { signal: options.signal }
+  );
+  return response.data;
+};

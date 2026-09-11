@@ -3,6 +3,7 @@ import WordGrid from './components/WordGrid.jsx';
 import Keyboard from './components/Keyboard.jsx';
 import StatsModal from './components/StatsModal.jsx';
 import SettingsModal from './components/SettingsModal.jsx';
+import HintModal from './components/HintModal.jsx';
 import Alert from './components/Alert.jsx';
 import { useNerdleGame } from './game/useNerdleGame';
 import {
@@ -16,6 +17,7 @@ import './styles/FullTerminal.css';
 import './styles/Responsive.css';
 
 const App = () => {
+  const [activeHint, setActiveHint] = useState('');
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [wordLength, setWordLength] = useState(() => {
@@ -37,6 +39,7 @@ const App = () => {
   const resolvedWindowStyle = resolveWindowStyle(windowStyle);
   const isFullTerminal = boardStyle === 'full-terminal';
   const {
+    gameId,
     attempts,
     currentGuess,
     message,
@@ -63,11 +66,13 @@ const App = () => {
 
   useEffect(() => {
     setIsStatsOpen(false);
+    setActiveHint('');
   }, [wordLength]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (
+        activeHint ||
         isStatsOpen ||
         isSettingsOpen ||
         event.ctrlKey ||
@@ -81,7 +86,7 @@ const App = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyPress, isStatsOpen, isSettingsOpen]);
+  }, [handleKeyPress, isStatsOpen, isSettingsOpen, activeHint]);
 
   const solved = attempts.at(-1)?.score.every((score) => score === 'correct');
   const attemptNumber = Math.min(
@@ -149,6 +154,15 @@ const App = () => {
           )}
         </div>
       </div>
+      {['category', 'letter'].map((type) => (
+        <HintModal
+          key={`${gameId}-${type}`}
+          gameId={gameId}
+          type={type}
+          isOpen={activeHint === type}
+          onClose={() => setActiveHint('')}
+        />
+      ))}
       <StatsModal
         isOpen={isStatsOpen}
         onClose={() => setIsStatsOpen(false)}
@@ -198,6 +212,25 @@ const App = () => {
             {boardStatus ||
               `guess ${String(attemptNumber).padStart(2, '0')} / 06`}
           </span>
+        </div>
+        <div className="board-hints" role="group" aria-label="Hints">
+          <span className="hints-label">Hints</span>
+          <button
+            className="hint-button"
+            onClick={() => setActiveHint('category')}
+            disabled={status !== 'playing'}
+            aria-label="Category hint"
+          >
+            Category
+          </button>
+          <button
+            className="hint-button"
+            onClick={() => setActiveHint('letter')}
+            disabled={status !== 'playing'}
+            aria-label="Letter hint"
+          >
+            Letter
+          </button>
         </div>
         <WordGrid
           attempts={attempts}

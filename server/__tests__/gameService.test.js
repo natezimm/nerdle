@@ -156,3 +156,46 @@ describe('gameService', () => {
     });
   });
 });
+
+test('hints skip solved positions, stay the same, and cost no attempts', () => {
+  const service = createGameService({ selectWord: () => 'apple' });
+  const { gameId } = service.createGame(5);
+  service.submitGuess(gameId, 'allee');
+  const hint = service.getHint(gameId);
+  expect(hint).toEqual({ ok: true, result: { position: 2, letter: 'p' } });
+  expect(service.getHint(gameId)).toEqual(hint);
+  expect(service.submitGuess(gameId, 'hello').result.attemptsRemaining).toBe(4);
+  service.submitGuess(gameId, 'apple');
+  expect(service.getHint(gameId).status).toBe(409);
+});
+test('hints reject missing and expired games', () => {
+  let time = 0;
+  const service = createGameService({
+    selectWord: () => 'apple',
+    now: () => time,
+    ttlMs: 10,
+  });
+  expect(service.getHint('missing').status).toBe(404);
+  const { gameId } = service.createGame(5);
+  time = 10;
+  expect(service.getHint(gameId).status).toBe(404);
+});
+
+test('category hints cover every answer without consuming the letter hint', async () => {
+  const { techWordsByLength } = await import('../techWords.js');
+  for (const word of Object.values(techWordsByLength).flat()) {
+    const service = createGameService({ selectWord: () => word });
+    const { gameId } = service.createGame(word.length);
+    const category = service.getHint(gameId, 'category');
+    expect(category.ok).toBe(true);
+    expect(category.result.category).toEqual(expect.any(String));
+    expect(category.result.category.length).toBeGreaterThan(5);
+    expect(Object.keys(category.result)).toEqual(['category']);
+    expect(service.getHint(gameId, 'letter').result).toEqual({
+      position: 1,
+      letter: word[0],
+    });
+    expect(service.submitGuess(gameId, word).result.attemptsRemaining).toBe(5);
+  }
+  expect(createGameService().getHint('missing', 'unknown').status).toBe(400);
+});

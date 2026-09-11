@@ -1,3 +1,4 @@
+import { wordCategories } from '../wordCategories.js';
 import { randomUUID } from 'node:crypto';
 import {
   getRandomTechWord,
@@ -85,6 +86,8 @@ export const createGameService = ({
       targetWord: selectWord(wordLength),
       wordLength,
       attempts: 0,
+      solvedPositions: new Set(),
+      hint: null,
       complete: false,
       lastActiveAt: createdAt,
     });
@@ -146,6 +149,9 @@ export const createGameService = ({
 
     game.attempts += 1;
     const score = scoreGuess(game.targetWord, normalized.word);
+    score.forEach((status, index) => {
+      if (status === LETTER_STATUS.CORRECT) game.solvedPositions.add(index);
+    });
     const won = normalized.word === game.targetWord;
     const complete = won || game.attempts >= MAX_ATTEMPTS;
     game.complete = complete;
@@ -168,7 +174,39 @@ export const createGameService = ({
     };
   };
 
+  const getHint = (gameId, type = 'letter') => {
+    if (!['category', 'letter'].includes(type))
+      return { ok: false, status: 400, error: 'Unknown hint type' };
+    removeExpiredGames();
+    const game = games.get(gameId);
+    if (!game)
+      return { ok: false, status: 404, error: 'Game not found or expired' };
+    if (game.complete)
+      return { ok: false, status: 409, error: 'Game is already complete' };
+    game.lastActiveAt = now();
+    if (type === 'category')
+      return {
+        ok: true,
+        result: { category: wordCategories[game.targetWord] },
+      };
+    if (!game.hint) {
+      const index = [...game.targetWord].findIndex(
+        (_, index) => !game.solvedPositions.has(index)
+      );
+      if (index === -1)
+        return {
+          ok: false,
+          status: 409,
+          error:
+            'You’ve already found every letter’s position. Use your green tiles to finish!',
+        };
+      game.hint = { position: index + 1, letter: game.targetWord[index] };
+    }
+    return { ok: true, result: game.hint };
+  };
+
   return {
+    getHint,
     createGame,
     submitGuess,
   };

@@ -255,3 +255,42 @@
     width: 40px;
   }
 }
+
+.board-hints {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  width: 100%;
+  max-width: 450px;
+  flex-shrink: 0;
+  padding: 0 8px 6px;
+  font: 500 12px/1.4 var(--font-mono);
+}
+.hints-label {
+  color: var(--color-text-secondary);
+  margin-right: auto;
+}
+.hint-button {
+  font: inherit;
+  color: var(--color-accent);
+  background: var(--card-bg);
+  border: 1px solid var(--color-accent);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.hint-button:hover:not(:disabled) {
+  background: var(--icon-button-hover-bg);
+}
+.hint-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.hint-result {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+}
+[data-app-style='terminal'] .hint-button {
+  border-radius: 0;
+}
