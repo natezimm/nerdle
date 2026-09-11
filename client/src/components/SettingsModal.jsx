@@ -9,6 +9,10 @@ const SettingsModal = ({
   onToggleTheme,
   wordLength,
   onWordLengthChange,
+  windowStyle = 'auto',
+  onWindowStyleChange,
+  boardStyle = 'tiles',
+  onBoardStyleChange,
 }) => {
   const dialogRef = useModalBehavior({ isOpen, onClose });
 
@@ -33,7 +37,9 @@ const SettingsModal = ({
         ref={dialogRef}
       >
         <div className="modal-header">
-          <h2 id="settings-title">Settings</h2>
+          <h2 id="settings-title" aria-label="Settings">
+            Settings
+          </h2>
           <button
             className="close-button"
             onClick={onClose}
@@ -70,7 +76,7 @@ const SettingsModal = ({
             <div className="settings-label">Word Length</div>
             <div
               className="settings-options"
-              role="radiogroup"
+              role="group"
               aria-label="Word length"
             >
               {[4, 5, 6].map((len) => (
@@ -86,6 +92,67 @@ const SettingsModal = ({
               ))}
             </div>
           </div>
+
+          <div className="settings-row settings-row-multi">
+            <div className="settings-label" id="game-style-label">
+              Game style
+            </div>
+            <div
+              className="settings-options settings-options-wide"
+              role="group"
+              aria-labelledby="game-style-label"
+            >
+              {[
+                ['tiles', 'Tiles', 'Tile board'],
+                ['terminal', 'Grid', 'Terminal grid'],
+                ['full-terminal', 'Full', 'Full terminal'],
+              ].map(([value, label, description]) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={`settings-option ${boardStyle === value ? 'selected' : ''}`}
+                  onClick={() => onBoardStyleChange(value)}
+                  aria-pressed={boardStyle === value}
+                  title={description}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="settings-row settings-row-multi">
+            <div className="settings-label" id="window-style-label">
+              Window style
+            </div>
+            <div
+              className="settings-options settings-options-wide"
+              role="group"
+              aria-labelledby="window-style-label"
+              aria-describedby="window-style-hint"
+            >
+              {[
+                ['auto', 'Auto', 'Match your device'],
+                ['macos', 'Mac', 'macOS window style'],
+                ['windows', 'Win', 'Windows window style'],
+                ['none', 'None', 'No window decoration'],
+              ].map(([value, label, description]) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={`settings-option ${windowStyle === value ? 'selected' : ''}`}
+                  onClick={() => onWindowStyleChange(value)}
+                  aria-pressed={windowStyle === value}
+                  title={description}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <p id="window-style-hint" className="settings-hint">
+            Decorative title bar. Auto follows your device.
+          </p>
         </div>
       </div>
     </div>

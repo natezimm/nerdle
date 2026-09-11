@@ -26,7 +26,9 @@ const StatsModal = ({ isOpen, onClose, wordLength = 5 }) => {
       >
         <div className="modal-header">
           <div>
-            <h2 id="stats-title">Statistics</h2>
+            <h2 id="stats-title" aria-label="Statistics">
+              Statistics
+            </h2>
             <div className="stats-mode">{wordLength}-letter</div>
           </div>
           <button

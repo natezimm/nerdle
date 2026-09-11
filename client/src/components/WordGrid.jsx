@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/WordGrid.css';
 
-const WordGrid = ({ attempts, currentGuess, wordLength = 5 }) => {
+const WordGrid = ({
+  attempts,
+  currentGuess,
+  wordLength = 5,
+  isPlaying = true,
+}) => {
   const totalRows = 6;
   const [flippedLetters, setFlippedLetters] = useState([]);
   const [flippingRow, setFlippingRow] = useState(null);
@@ -47,45 +52,30 @@ const WordGrid = ({ attempts, currentGuess, wordLength = 5 }) => {
   };
 
   return (
-    /* Outer container: fills available flexible space in parent, centers content */
-    <div
-      className="word-grid-container"
-      style={{
-        flex: 1,
-        minHeight: 0,
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center' /* Center vertically */,
-        justifyContent: 'center' /* Center horizontally */,
-        /* overflow: 'hidden', Removed to prevent clipping borders */
-        padding: '10px' /* Prevent edge clipping */,
-      }}
-    >
-      {/* Inner container: maintains aspect ratio and clamps sizing */}
-      <div
-        className="word-grid word-grid-aspect"
-        style={{
-          width: '100%',
-          maxWidth: '350px',
-          aspectRatio: '5/6',
-          maxHeight: '92%' /* Balanced buffer for spacing */,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-        }}
-      >
+    <div className="word-grid-container">
+      <div className={`word-grid word-grid-${wordLength}`}>
         {Array.from({ length: totalRows }).map((_, rowIndex) => {
           const isCurrentRow = rowIndex === attempts.length;
           const attempt = attempts[rowIndex];
           const guess = isCurrentRow ? currentGuess : attempt?.word || '';
 
           return (
-            <div key={rowIndex} className="word-row">
+            <div
+              key={rowIndex}
+              className={`word-row ${isCurrentRow && isPlaying ? 'word-row-active' : ''}`}
+            >
+              <span className="row-number" aria-hidden="true">
+                {String(rowIndex + 1).padStart(2, '0')}
+              </span>
               {Array.from({ length: wordLength }).map((_, letterIndex) => {
                 const letter = guess[letterIndex] || '';
                 const statusClass =
                   !isCurrentRow && letter ? attempt?.score?.[letterIndex] : '';
                 const filledClass = letter ? 'letter-filled' : 'letter-empty';
+                const cursorClass =
+                  isCurrentRow && isPlaying && letterIndex === guess.length
+                    ? 'letter-cursor'
+                    : '';
                 const flipClass = statusClass
                   ? getFlipClasses(statusClass, rowIndex, letterIndex)
                   : '';
@@ -93,7 +83,7 @@ const WordGrid = ({ attempts, currentGuess, wordLength = 5 }) => {
                 return (
                   <span
                     key={letterIndex}
-                    className={`letter ${filledClass} ${flipClass}`}
+                    className={`letter ${filledClass} ${flipClass} ${cursorClass}`}
                   >
                     {letter}
                   </span>

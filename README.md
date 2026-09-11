@@ -97,6 +97,12 @@ cd ../server && npm ci
 
 ## Testing & Quality
 
+Install the Chromium and WebKit browsers once before running browser checks:
+
+```bash
+npx playwright install --with-deps chromium webkit
+```
+
 - **Root quality gates**
 
   ```bash

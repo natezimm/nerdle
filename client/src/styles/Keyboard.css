@@ -1,49 +1,70 @@
 .keyboard {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: clamp(4px, calc(var(--viewport-height) * 0.008), 6px);
   width: 100%;
   max-width: 500px;
-  /* Prevent being too wide on desktop */
-  padding: 0 8px;
-  /* Safe padding for edges */
+  flex-shrink: 0;
+  padding: 0 12px;
   box-sizing: border-box;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .keyboard-row {
   display: flex;
   justify-content: center;
-  gap: 6px;
-  /* Restored larger gap */
+  gap: clamp(4px, 0.9vw, 6px);
   width: 100%;
   margin: 0 auto;
 }
 
 .key {
   flex: 1;
-  /* Grow to fill space */
-  height: 52px;
-  font-size: 1.15rem;
-  font-weight: bold;
+  height: clamp(40px, calc(var(--viewport-height) * 0.064), 52px);
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-size: clamp(0.9rem, 2vh, 1.15rem);
+  font-weight: 700;
   text-transform: uppercase;
-  border: none;
+  border: 1px solid var(--key-border);
   background-color: var(--key-bg);
   color: var(--key-text);
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   min-width: 0;
-  /* Allow shrinking below content size if needed */
-  padding: 0;
+  padding: 0 2px;
+  user-select: none;
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset -1px 0 0 rgba(255, 255, 255, 0.08);
+  transition:
+    transform 0.08s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.08s ease;
+}
+
+.key:hover {
+  background-color: var(--key-hover-bg);
+  border-color: rgba(56, 189, 248, 0.4);
+  transform: translateY(-1px);
+}
+
+.key:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .key-wide {
   flex: 1.5;
-  /* Enter/Backspace should be larger */
-  font-size: 0.75rem;
+  font-size: clamp(0.72rem, 1.6vh, 0.82rem);
+  letter-spacing: 0.5px;
 }
 
 .half-spacer {
@@ -51,35 +72,45 @@
 }
 
 .key.correct {
-  background-color: #6aaa64;
-  color: white;
+  background: var(--status-correct-bg);
+  border: 1px solid rgba(16, 185, 129, 0.8);
+  color: var(--status-correct-text);
+  box-shadow:
+    var(--status-correct-shadow),
+    0 3px 0 rgba(5, 150, 105, 0.4);
 }
 
 .key.present {
-  background-color: #c9b458;
-  color: white;
+  background: var(--status-present-bg);
+  border: 1px solid rgba(245, 158, 11, 0.8);
+  color: var(--status-present-text);
+  box-shadow:
+    var(--status-present-shadow),
+    0 3px 0 rgba(217, 119, 6, 0.4);
 }
 
 .key.absent {
   background-color: var(--status-absent-bg);
-  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--status-absent-text);
 }
 
 .backspace-icon {
   fill: var(--backspace-fill);
+  transition: fill 0.15s ease;
 }
 
 @media (max-width: 600px) {
-  .key {
-    font-size: 1rem;
-  }
-
-  .key-wide {
-    font-size: 0.75rem;
+  .keyboard {
+    padding: 0 8px;
+    gap: 4px;
   }
 
   .keyboard-row {
     gap: 4px;
-    /* Slightly tighter on mobile but still distinct */
+  }
+
+  .key {
+    border-radius: 6px;
   }
 }

@@ -172,6 +172,65 @@ describe('App', () => {
     expect(letterCells[1]).toHaveTextContent('');
   });
 
+  test.each([
+    ['Statistics', 'Close statistics'],
+    ['Settings', 'Close settings'],
+  ])(
+    'ignores physical game input while %s is open',
+    async (name, closeName) => {
+      const { container } = render(<App />);
+      await typeKeys('appl');
+      const currentRow = container.querySelector('.word-grid .word-row');
+      const currentLetters = () =>
+        Array.from(
+          currentRow.querySelectorAll('.letter'),
+          (cell) => cell.textContent
+        ).join('');
+
+      fireEvent.click(screen.getByRole('button', { name, exact: true }));
+      expect(screen.getByRole('dialog', { name })).toBeInTheDocument();
+
+      await typeKeys('e');
+      expect(currentLetters()).toBe('appl');
+      await typeKeys('{Backspace}');
+      expect(currentLetters()).toBe('appl');
+      await typeKeys('{Enter}');
+      expect(guessCalls()).toHaveLength(0);
+      expect(screen.queryByText(/Guess must be/i)).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: closeName }));
+      expect(screen.queryByRole('dialog', { name })).not.toBeInTheDocument();
+      await typeKeys('e{Enter}');
+      expect(axios.post).toHaveBeenCalledWith(
+        '/api/games/game-1/guesses',
+        { word: 'apple' },
+        expect.objectContaining({ signal: expect.any(Object) })
+      );
+    }
+  );
+
+  test.each(['ctrlKey', 'metaKey'])(
+    'ignores letter shortcuts using %s',
+    async (modifier) => {
+      const { container } = render(<App />);
+      await typeKeys('ap');
+
+      fireEvent.keyDown(window, { key: 'x', [modifier]: true });
+      const currentLetters = Array.from(
+        container.querySelectorAll('.word-grid .word-row:first-child .letter'),
+        (cell) => cell.textContent
+      ).join('');
+      expect(currentLetters).toBe('ap');
+
+      await typeKeys('ple{Enter}');
+      expect(axios.post).toHaveBeenCalledWith(
+        '/api/games/game-1/guesses',
+        { word: 'apple' },
+        expect.objectContaining({ signal: expect.any(Object) })
+      );
+    }
+  );
+
   test('updates keyboard letter statuses after a guess', async () => {
     vi.useFakeTimers();
     render(<App />);

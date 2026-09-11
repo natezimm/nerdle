@@ -5,7 +5,15 @@ import StatsModal from './components/StatsModal.jsx';
 import SettingsModal from './components/SettingsModal.jsx';
 import Alert from './components/Alert.jsx';
 import { useNerdleGame } from './game/useNerdleGame';
+import {
+  BOARD_STYLES,
+  WINDOW_STYLES,
+  readAppearance,
+  resolveWindowStyle,
+} from './utils/appearance';
 import './App.css';
+import './styles/FullTerminal.css';
+import './styles/Responsive.css';
 
 const App = () => {
   const [isStatsOpen, setIsStatsOpen] = useState(false);
@@ -20,10 +28,19 @@ const App = () => {
     if (storedTheme === 'light' || storedTheme === 'dark') return storedTheme;
     return 'light';
   });
+  const [windowStyle, setWindowStyle] = useState(() =>
+    readAppearance('windowStyle', WINDOW_STYLES, 'auto')
+  );
+  const [boardStyle, setBoardStyle] = useState(() =>
+    readAppearance('boardStyle', BOARD_STYLES, 'tiles')
+  );
+  const resolvedWindowStyle = resolveWindowStyle(windowStyle);
+  const isFullTerminal = boardStyle === 'full-terminal';
   const {
     attempts,
     currentGuess,
     message,
+    status,
     letterStatuses,
     handleKeyPress,
     clearMessage,
@@ -39,33 +56,98 @@ const App = () => {
   }, [wordLength]);
 
   useEffect(() => {
+    localStorage.setItem('windowStyle', windowStyle);
+    localStorage.setItem('boardStyle', boardStyle);
+    document.documentElement.dataset.appearance = boardStyle;
+  }, [windowStyle, boardStyle]);
+
+  useEffect(() => {
     setIsStatsOpen(false);
   }, [wordLength]);
 
   useEffect(() => {
-    const handleKeyDown = (event) => handleKeyPress(event.key);
+    const handleKeyDown = (event) => {
+      if (
+        isStatsOpen ||
+        isSettingsOpen ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.altKey ||
+        event.defaultPrevented
+      ) {
+        return;
+      }
+      handleKeyPress(event.key);
+    };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyPress]);
+  }, [handleKeyPress, isStatsOpen, isSettingsOpen]);
+
+  const solved = attempts.at(-1)?.score.every((score) => score === 'correct');
+  const attemptNumber = Math.min(
+    attempts.length + (status === 'revealing' || status === 'complete' ? 0 : 1),
+    6
+  );
+  const boardStatus = {
+    loading: 'starting…',
+    error: 'unavailable',
+    validating: 'checking…',
+    revealing: 'revealing…',
+    complete: solved ? 'solved ✓' : 'finished',
+  }[status];
 
   return (
-    <main className="game-container" aria-label="Nerdle game">
+    <main
+      className="game-container"
+      aria-label="Nerdle game"
+      data-window-style={resolvedWindowStyle}
+      data-app-style={isFullTerminal ? 'terminal' : 'default'}
+    >
       <div className="header">
-        <h1>Nerdle</h1>
-        <button
-          className="stats-button"
-          onClick={() => setIsStatsOpen(true)}
-          aria-label="Statistics"
-        >
-          <i className="fa-solid fa-trophy"></i>
-        </button>
-        <button
-          className="settings-button"
-          onClick={() => setIsSettingsOpen(true)}
-          aria-label="Settings"
-        >
-          <i className="fa-solid fa-gear"></i>
-        </button>
+        <div className="header-brand">
+          {resolvedWindowStyle === 'macos' && (
+            <div className="terminal-dots" aria-hidden="true">
+              <span className="dot dot-close"></span>
+              <span className="dot dot-min"></span>
+              <span className="dot dot-max"></span>
+            </div>
+          )}
+          <h1 aria-label="Nerdle" className="brand-title">
+            <span className="brand-bracket">{isFullTerminal ? '$' : '<'}</span>
+            <span className="brand-name">Nerdle</span>
+            {!isFullTerminal && (
+              <>
+                <span className="brand-slash"> /&gt;</span>
+                <span className="brand-cursor" aria-hidden="true">
+                  _
+                </span>
+              </>
+            )}
+          </h1>
+        </div>
+        <div className="header-actions">
+          <button
+            className="stats-button"
+            onClick={() => setIsStatsOpen(true)}
+            aria-label="Statistics"
+          >
+            {isFullTerminal ? 'stats' : <i className="fa-solid fa-trophy"></i>}
+          </button>
+          <button
+            className="settings-button"
+            onClick={() => setIsSettingsOpen(true)}
+            aria-label="Settings"
+          >
+            {isFullTerminal ? 'config' : <i className="fa-solid fa-gear"></i>}
+          </button>
+          {resolvedWindowStyle === 'windows' && (
+            <div className="windows-controls" aria-hidden="true">
+              <svg width="48" height="12" viewBox="0 0 48 12" fill="none">
+                <path d="M1 9h8M20 2h8v8h-8zM39 2l8 8m0-8-8 8" />
+              </svg>
+            </div>
+          )}
+        </div>
       </div>
       <StatsModal
         isOpen={isStatsOpen}
@@ -81,6 +163,10 @@ const App = () => {
         }
         wordLength={wordLength}
         onWordLengthChange={(len) => setWordLength(len)}
+        windowStyle={windowStyle}
+        onWindowStyleChange={setWindowStyle}
+        boardStyle={boardStyle}
+        onBoardStyleChange={setBoardStyle}
       />
       <Alert
         isOpen={!!message}
@@ -88,11 +174,36 @@ const App = () => {
         onClose={clearMessage}
         duration={3000}
       />
-      <div className="game-content">
+      <div
+        className="game-content"
+        data-board-style={boardStyle === 'tiles' ? 'tiles' : 'terminal'}
+      >
+        <div className="board-toolbar">
+          <span className="board-mode">
+            <span className="visually-hidden">
+              {wordLength}-letter tech word
+            </span>
+            <span aria-hidden="true">
+              {boardStyle !== 'tiles' && (
+                <span className="terminal-prompt">&gt; </span>
+              )}
+              letters<span className="code-punctuation">: </span>
+              {wordLength}
+            </span>
+            <span className="board-topic" aria-hidden="true">
+              {' // tech words'}
+            </span>
+          </span>
+          <span className="board-status" role="status">
+            {boardStatus ||
+              `guess ${String(attemptNumber).padStart(2, '0')} / 06`}
+          </span>
+        </div>
         <WordGrid
           attempts={attempts}
           currentGuess={currentGuess}
           wordLength={wordLength}
+          isPlaying={status === 'playing' || status === 'validating'}
         />
       </div>
       <Keyboard onKeyPress={handleKeyPress} letterStatuses={letterStatuses} />
