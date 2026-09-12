@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import WordGrid from './components/WordGrid.jsx';
-import Keyboard from './components/Keyboard.jsx';
-import StatsModal from './components/StatsModal.jsx';
-import SettingsModal from './components/SettingsModal.jsx';
-import HintModal from './components/HintModal.jsx';
+import { useEffect, useState } from 'react';
+import './App.css';
 import Alert from './components/Alert.jsx';
+import HintModal from './components/HintModal.jsx';
+import Keyboard from './components/Keyboard.jsx';
+import SettingsModal from './components/SettingsModal.jsx';
+import StatsModal from './components/StatsModal.jsx';
+import WordGrid from './components/WordGrid.jsx';
 import { useNerdleGame } from './game/useNerdleGame';
+import './styles/FullTerminal.css';
+import './styles/Responsive.css';
 import {
   BOARD_STYLES,
   WINDOW_STYLES,
   readAppearance,
   resolveWindowStyle,
 } from './utils/appearance';
-import './App.css';
-import './styles/FullTerminal.css';
-import './styles/Responsive.css';
 
 const App = () => {
   const [activeHint, setActiveHint] = useState('');
@@ -34,7 +34,7 @@ const App = () => {
     readAppearance('windowStyle', WINDOW_STYLES, 'auto')
   );
   const [boardStyle, setBoardStyle] = useState(() =>
-    readAppearance('boardStyle', BOARD_STYLES, 'tiles')
+    readAppearance('boardStyle', BOARD_STYLES, 'full-terminal')
   );
   const resolvedWindowStyle = resolveWindowStyle(windowStyle);
   const isFullTerminal = boardStyle === 'full-terminal';

@@ -1,5 +1,5 @@
 export const WINDOW_STYLES = ['auto', 'macos', 'windows', 'none'];
-export const BOARD_STYLES = ['tiles', 'terminal', 'full-terminal'];
+export const BOARD_STYLES = ['full-terminal', 'terminal', 'tiles'];
 
 export const readAppearance = (key, options, fallback) => {
   const stored = localStorage.getItem(key);

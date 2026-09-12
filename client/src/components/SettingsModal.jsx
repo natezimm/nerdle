@@ -1,6 +1,5 @@
-import React from 'react';
-import './SettingsModal.css';
 import { useModalBehavior } from '../hooks/useModalBehavior';
+import './SettingsModal.css';
 
 const SettingsModal = ({
   isOpen,
@@ -12,7 +11,7 @@ const SettingsModal = ({
   wordLengthDisabled = false,
   windowStyle = 'auto',
   onWindowStyleChange,
-  boardStyle = 'tiles',
+  boardStyle = 'full-terminal',
   onBoardStyleChange,
 }) => {
   const dialogRef = useModalBehavior({ isOpen, onClose });
@@ -105,9 +104,9 @@ const SettingsModal = ({
               aria-labelledby="game-style-label"
             >
               {[
-                ['tiles', 'Tiles', 'Tile board'],
-                ['terminal', 'Grid', 'Terminal grid'],
                 ['full-terminal', 'Full', 'Full terminal'],
+                ['terminal', 'Grid', 'Terminal grid'],
+                ['tiles', 'Tiles', 'Tile board'],
               ].map(([value, label, description]) => (
                 <button
                   key={value}
