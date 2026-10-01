@@ -58,21 +58,21 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.LIGHTSAIL_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.GCP_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.LIGHTSAIL_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.GCP_HOST }} >> ~/.ssh/known_hosts
 
           cat <<EOF > ~/.ssh/config
-          Host lightsail
-            HostName ${{ secrets.LIGHTSAIL_HOST }}
-            User ${{ secrets.LIGHTSAIL_USER }}
+          Host gcp
+            HostName ${{ secrets.GCP_HOST }}
+            User ${{ secrets.GCP_USER }}
             IdentityFile ~/.ssh/id_rsa
             StrictHostKeyChecking=yes
           EOF
 
-      - name: Deploy to Lightsail
+      - name: Deploy to GCP
         run: |
-          ssh lightsail "bash ~/deploy-scripts/deploy-nerdle.sh"
+          ssh gcp "bash ~/deploy-scripts/deploy-nerdle.sh"
 
       - name: Health check (client + server)
         run: |

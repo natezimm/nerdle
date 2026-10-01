@@ -25,7 +25,7 @@ Live: `https://nerdle.nathanzimmerman.com`
 - **Client**: React 18, Vite, Axios, Testing Library / Vitest.
 - **Server**: Node.js (ESM, Node 22), Express, `word-list`, Jest + Supertest.
 - **Quality**: ESLint, Prettier, TypeScript `checkJs`, coverage thresholds.
-- **Deploy**: GitHub Actions + AWS Lightsail (via SSH).
+- **Deploy**: GitHub Actions + AWS GCP (via SSH).
 
 See [`docs/architecture.md`](docs/architecture.md) for runtime boundaries, quality gates, deployment flow, and deferred architecture follow-ups.
 
@@ -155,8 +155,8 @@ npx playwright install --with-deps chromium webkit
 
   The build output lands in `client/build`.
 
-- **Deploy (Lightsail)**
-  - GitHub Actions runs CI, then SSHes into a Lightsail instance and runs `~/deploy-scripts/deploy-nerdle.sh`.
+- **Deploy (GCP)**
+  - GitHub Actions runs CI, then SSHes into a GCP instance and runs `~/deploy-scripts/deploy-nerdle.sh`.
   - The workflow also checks `GET /` and `GET /api/health` after deploy (see `.github/workflows/deploy.yml`).
 
 ## API Endpoints

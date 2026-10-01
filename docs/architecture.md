@@ -49,7 +49,7 @@ Run `npm run quality` from the repo root after installing root, client, and serv
 
 ## Deployment Flow
 
-GitHub Actions runs the root quality gate for pull requests and pushes to `main`. Pushes to `main` deploy through a protected production job that SSHes to Lightsail and runs `~/deploy-scripts/deploy-nerdle.sh`, then checks `/` and `/api/health`.
+GitHub Actions runs the root quality gate for pull requests and pushes to `main`. Pushes to `main` deploy through a protected production job that SSHes to GCP and runs `~/deploy-scripts/deploy-nerdle.sh`, then checks `/` and `/api/health`.
 
 ## Workspace Connectivity
 
@@ -79,12 +79,12 @@ flowchart LR
   NerdleRepo --> Actions
   SudokuRepo --> Actions
   BlackjackRepo --> Actions
-  Actions --> Lightsail["AWS Lightsail<br/>static sites + app services"]
-  Lightsail --> PortfolioSite
-  Lightsail --> BrickSite
-  Lightsail --> NerdleSite
-  Lightsail --> SudokuSite
-  Lightsail --> BlackjackSite
+  Actions --> GCP["AWS GCP<br/>static sites + app services"]
+  GCP --> PortfolioSite
+  GCP --> BrickSite
+  GCP --> NerdleSite
+  GCP --> SudokuSite
+  GCP --> BlackjackSite
 
   classDef user fill:#f8fafc,stroke:#475569,color:#0f172a
   classDef site fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e
@@ -96,7 +96,7 @@ flowchart LR
   classDef external fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
   class PortfolioRepo,BrickRepo,NerdleRepo,SudokuRepo,BlackjackRepo repo
   class PortfolioSite,BrickSite,NerdleSite,SudokuSite,BlackjackSite site
-  class Actions,Lightsail delivery
+  class Actions,GCP delivery
 ```
 
 ## Game State
