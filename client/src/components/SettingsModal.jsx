@@ -11,7 +11,7 @@ const SettingsModal = ({
   wordLengthDisabled = false,
   windowStyle = 'auto',
   onWindowStyleChange,
-  boardStyle = 'full-terminal',
+  boardStyle = 'tiles',
   onBoardStyleChange,
 }) => {
   const dialogRef = useModalBehavior({ isOpen, onClose });
@@ -104,9 +104,9 @@ const SettingsModal = ({
               aria-labelledby="game-style-label"
             >
               {[
+                ['tiles', 'Tiles', 'Tile board'],
                 ['full-terminal', 'Full', 'Full terminal'],
                 ['terminal', 'Grid', 'Terminal grid'],
-                ['tiles', 'Tiles', 'Tile board'],
               ].map(([value, label, description]) => (
                 <button
                   key={value}

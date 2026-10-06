@@ -34,7 +34,7 @@ const App = () => {
     readAppearance('windowStyle', WINDOW_STYLES, 'auto')
   );
   const [boardStyle, setBoardStyle] = useState(() =>
-    readAppearance('boardStyle', BOARD_STYLES, 'full-terminal')
+    readAppearance('boardStyle', BOARD_STYLES, 'tiles')
   );
   const resolvedWindowStyle = resolveWindowStyle(windowStyle);
   const isFullTerminal = boardStyle === 'full-terminal';

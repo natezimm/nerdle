@@ -57,9 +57,9 @@ const windowStyleNames = {
   none: 'None',
 };
 const gameStyleNames = {
+  tiles: 'Tiles',
   'full-terminal': 'Full',
   terminal: 'Grid',
-  tiles: 'Tiles',
 };
 
 const styleOption = (settings, groupName, name) =>
@@ -357,7 +357,7 @@ test.describe('nerdle client', () => {
     await page.goto('/');
     await expect(page.getByRole('main')).toHaveAttribute(
       'data-app-style',
-      'terminal'
+      'default'
     );
 
     await expect(page).toHaveTitle(/Nerdle/);
