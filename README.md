@@ -3,9 +3,11 @@
 
 # Nerdle
 
-Nerdle is a Wordle-inspired experience that focuses on technology vocabulary. A React frontend pairs with an Express backend to run server-owned games, validate and score guesses, show letter-flip animations, and store persistent gameplay statistics.
+> **Retired.** The live demo at `nerdle.nathanzimmerman.com` is offline and this project is no longer maintained. The code still builds and runs locally; see [Running Locally](#running-locally).
 
-Live: `https://nerdle.nathanzimmerman.com`
+![Playing a game of Nerdle](docs/media/demo.gif)
+
+Nerdle is a Wordle-inspired experience that focuses on technology vocabulary. A React frontend pairs with an Express backend to run server-owned games, validate and score guesses, show letter-flip animations, and store persistent gameplay statistics.
 
 ## Features
 
@@ -25,7 +27,7 @@ Live: `https://nerdle.nathanzimmerman.com`
 - **Client**: React 18, Vite, Axios, Testing Library / Vitest.
 - **Server**: Node.js (ESM, Node 22), Express, `word-list`, Jest + Supertest.
 - **Quality**: ESLint, Prettier, TypeScript `checkJs`, coverage thresholds.
-- **Deploy**: GitHub Actions + AWS GCP (via SSH).
+- **Deploy**: GitHub Actions + GCP (via SSH), while the demo was live.
 
 See [`docs/architecture.md`](docs/architecture.md) for runtime boundaries, quality gates, deployment flow, and deferred architecture follow-ups.
 
@@ -155,9 +157,9 @@ npx playwright install --with-deps chromium webkit
 
   The build output lands in `client/build`.
 
-- **Deploy (GCP)**
-  - GitHub Actions runs CI, then SSHes into a GCP instance and runs `~/deploy-scripts/deploy-nerdle.sh`.
-  - The workflow also checks `GET /` and `GET /api/health` after deploy (see `.github/workflows/deploy.yml`).
+- **Deploy (GCP, retired)**
+  - While the demo was live, GitHub Actions ran CI, then SSHed into a GCP instance and ran `~/deploy-scripts/deploy-nerdle.sh`.
+  - The workflow also checked `GET /` and `GET /api/health` after deploy (see `.github/workflows/deploy.yml`).
 
 ## API Endpoints
 
