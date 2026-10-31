@@ -5,8 +5,7 @@
 
 > **Retired.** The live demo at `nerdle.nathanzimmerman.com` is offline and this project is no longer maintained. The code still builds and runs locally; see [Running Locally](#running-locally).
 
-<!-- Demo recording: save it as docs/media/demo.gif, then uncomment the next line. -->
-<!-- ![Playing a game of Nerdle](docs/media/demo.gif) -->
+![Playing a game of Nerdle](docs/media/demo.gif)
 
 Nerdle is a Wordle-inspired experience that focuses on technology vocabulary. A React frontend pairs with an Express backend to run server-owned games, validate and score guesses, show letter-flip animations, and store persistent gameplay statistics.
 
