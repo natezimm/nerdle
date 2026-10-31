@@ -22,7 +22,7 @@ flowchart LR
   Guess --> Dictionary["Tech words + word-list dictionary"]
   Express --> Middleware["Helmet, CORS,<br/>rate limits, validation"]
   Repo["Repo quality gate<br/>npm run quality"] --> Build["Client build<br/>client/build"]
-  Build --> Deploy["GitHub Actions<br/>deploy-nerdle.sh"]
+  Build --> CI["GitHub Actions<br/>CI only (demo retired)"]
 
   classDef user fill:#f8fafc,stroke:#475569,color:#0f172a
   classDef site fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e
@@ -36,7 +36,7 @@ flowchart LR
   class Client,GameState,UI,ApiClient client
   class Express,Start,Guess,Middleware server
   class Stats,Games,Words,Dictionary data
-  class Repo,Build,Deploy delivery
+  class Repo,Build,CI delivery
 ```
 
 ## Source Boundaries
@@ -49,7 +49,7 @@ Run `npm run quality` from the repo root after installing root, client, and serv
 
 ## Deployment Flow
 
-GitHub Actions runs the root quality gate for pull requests and pushes to `main`. Pushes to `main` deploy through a protected production job that SSHes to GCP and runs `~/deploy-scripts/deploy-nerdle.sh`, then checks `/` and `/api/health`.
+GitHub Actions runs the root quality gate for pull requests and pushes to `main`. The demo is retired, so nothing deploys.
 
 ## Workspace Connectivity
 

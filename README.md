@@ -1,4 +1,4 @@
-[![CI](https://github.com/natezimm/nerdle/actions/workflows/deploy.yml/badge.svg)](https://github.com/natezimm/nerdle/actions/workflows/deploy.yml)
+[![CI](https://github.com/natezimm/nerdle/actions/workflows/ci.yml/badge.svg)](https://github.com/natezimm/nerdle/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-checked-brightgreen)](#testing--quality)
 
 # Nerdle
@@ -159,7 +159,7 @@ npx playwright install --with-deps chromium webkit
 
 - **Deploy (GCP, retired)**
   - While the demo was live, GitHub Actions ran CI, then SSHed into a GCP instance and ran `~/deploy-scripts/deploy-nerdle.sh`.
-  - The workflow also checked `GET /` and `GET /api/health` after deploy (see `.github/workflows/deploy.yml`).
+  - The workflow also checked `GET /` and `GET /api/health` after deploy. That deploy job has been removed; `.github/workflows/ci.yml` now runs only CI.
 
 ## API Endpoints
 

@@ -47,4 +47,4 @@ Run these commands from the repo root:
 
 Run relevant checks and use `npm run quality` for broad application changes. Report failures and checks not run. Edit sources rather than generated builds or reports, and update this guide when commands or architecture change.
 
-All five repos default to Playwright port 4173. Run browser suites sequentially and stop unrelated previews first: local Playwright runs reuse an existing server, which can accidentally test another repo. `.github/workflows/deploy.yml` runs CI for PRs targeting `main` and pushes to `main`; successful main pushes deploy through the `production` environment and external GCP script.
+All five repos default to Playwright port 4173. Run browser suites sequentially and stop unrelated previews first: local Playwright runs reuse an existing server, which can accidentally test another repo. `.github/workflows/ci.yml` runs CI for PRs targeting `main` and pushes to `main`. The demo is retired, so nothing deploys.
